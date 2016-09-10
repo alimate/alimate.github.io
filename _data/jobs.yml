@@ -1,0 +1,24 @@
+-   title: Crowd Funding Hub
+    company: Asre Danesh Afzar
+    description:  "A hub to promote various projects from different crowd funding platforms. <br> Techs: Spring Boot, Gradle, Play! Framework, SBT, Swagger, Oracle, Supervisord, Flyway, Jenkins, etc."
+    period: 2016 - Today
+
+-   title: DevOps Engineer
+    company: Asre Danesh Afzar
+    description: "Providing the required infrastructures for developers to develop, test, document and deploy their services more efficiently.<br> Techs: Docker, Jenkins, Swagger, Git, Gitlab, etc."
+    period: 2015 - Today
+
+-   title: Cando Android Market
+    company: Asre Danesh Afzar
+    description: "Developed its Search Platform, Deployed its Caching Infrastructure, Developed a Content-Based algorithm for App Recommendation Service, Developed background tasks to keep app repository in sync with Google Play, etc.<br>Techs: Spring Framework, Jersey, Solr, Varnish, etc."
+    period: 2013 - 2016
+
+-   title: Python Web Developer
+    company: Freelance
+    description: "Techs: Python, Django, Flask, Pandas, etc."
+    period: 2010 - 2013
+
+-   title: PHP Web Developer
+    company: Freelance
+    description: "Techs: PHP, Cake, HTML, CSS, etc."
+    period: 2007 - 2010

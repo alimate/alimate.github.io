@@ -1,0 +1,13 @@
+---
+# Main Sass file
+---
+
+// Import all partials from _sass
+@import
+    'reset',
+    'cvlayout',
+    'typography',
+    'header',
+    'footer',
+    'resume'
+;

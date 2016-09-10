@@ -63,6 +63,16 @@ dl, dd, ol, ul, figure {
     padding: 0;
 }
 
+.post-content h1 {
+  font-family: "PT Sans"
+}
+
+hr {
+  opacity: 0.3;
+  margin-top: -0.5em;
+  margin-bottom: 0.5em;
+}
+
 
 
 /**
@@ -384,10 +394,11 @@ pre {
   }
 }
 .site-description {
-  font-size: 14px;
-  letter-spacing: 2px;
+  font-size: 18px;
   text-indent: 6px;
-  font-family: 'Josefin Sans';
+  font-style: italic;
+  font-family: monospace;
+  opacity: 0.5;
 }
 .exclamationMark {
   padding-left: 2em;
@@ -582,7 +593,8 @@ pre {
   margin-bottom: $spacing-unit;
   padding-bottom: 3em !important;
   p {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    text-align: justify;
   }
   h2 {
     font-size: 32px;

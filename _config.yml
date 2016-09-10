@@ -6,13 +6,22 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: Gravity
-email: hemangsk@gmail.com
-description: The Liberal Jekyll Theme
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://yourdomain.com" # the base hostname & protocol for your site
-twitter_username: hemang_kumar
-github_username:  hemangsk
+cv_title: Ali Dehghani
+cv_email: ali.dehghani.g@gmail.com
+cv_description: "Ali Dehghani's CV"
+url: "http://alidg.me"
+cv_name: Ali Dehghani
+cv_job: Software Engineer
+cv_location: Tehran, Iran
+twitter_username: alidehghanig
+github_username:  alimate
+email_address: ali.dehghani.g@gmail.com
+
+# Blog specific
+title: Kemikit
+head_title: "Ali Dehghani's Blog"
+email: ali.dehghani.g@gmail.com
+description: A chemical romance bursts into the IT world
 
 # Build settings
 markdown: kramdown
