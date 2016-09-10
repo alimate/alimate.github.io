@@ -58,7 +58,7 @@ CompletableFuture.allOf(futures).join();
 `java.httpclient` module also contains a client for WebSocket. `WebScoket` interface is the heart of this new
 addition which contains four other abstractions to build, represent close codes, listen for events and messages and finally, handling
 partial messages.<br>
-For starters, we should implement the `WebSocket.Listener` interface, which, as its name suggests, is a a listener for events and messages on a `WebSocket`. For example, after receiving each message, we're sending a request for one more message and then printing the current message on console:
+For starters, we could implement the `WebSocket.Listener` interface, which, as its name suggests, is a listener for events and messages on a `WebSocket`. For example, here after receiving each message, we're sending a request for one more message and then printing the current message on console:
 {% highlight java %}
 class EchoListener implements WebSocket.Listener {
     @Override
