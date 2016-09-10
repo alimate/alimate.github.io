@@ -3,6 +3,7 @@ layout: post
 title: "Java 9: High level HTTP and WebSocket API"
 permalink: /blog/2016/9/10/java-9-http-websocket-client
 comments: true
+github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2016-9-10-java-9-http-websocket-client.md"
 ---
 Although the flagship feature of Java 9 is *Modularity*, a large number of other enhancements are planned for this release. One of those is the new HTTP client API that supports HTTP/2 and WebSocket and, hopefully, will replace the legacy `HttpUrlConnection` API. <br>
 This new API is part of the `java.httpclient` module. So, if you're going to use this module, you should declare that your module *requires* the `java.httpclient` module:
