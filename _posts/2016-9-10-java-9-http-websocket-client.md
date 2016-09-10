@@ -74,6 +74,6 @@ class EchoListener implements WebSocket.Listener {
 
 Then using the `newBuilder` static factory method we can connect to the WebSocket API:
 {% highlight java %}
-WebSocket.newBuilder(new URI("ws://localhost:8080/trades"), new EchoListener())
+WebSocket.newBuilder(new URI("ws://spring-sockets.herokuapp.com/stocks"), new EchoListener())
          .buildAsync().join();
 {% endhighlight %}
