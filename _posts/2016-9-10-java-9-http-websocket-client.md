@@ -49,9 +49,9 @@ method one can simply compose and combine multiple `HttpResponse`es, react when 
 even transform it to whatever she likes, all in a very declarative way:<br>
 {% highlight java %}
 /*
-  Two web targets to consume asynchronously
+  Two web targets to consume asynchronously. List.of is part of Java 9, too.
  */
-List<URI> targets = Arrays.asList(
+List<URI> targets = List.of(
         new URI("http://alidg.me"),
         new URI("http://stackoverflow.com")
 );
