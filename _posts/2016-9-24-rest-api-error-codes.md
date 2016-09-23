@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "RESTful API Design: How to handle errors?"
-permalink: /blog/2016/9/24/rest-api-error-handing
+permalink: /blog/2016/9/24/rest-api-error-handling
 excerpt: "We, as software developers, like to only consider happy paths in our scenarios and consequently, tend to forget the fact
 that *Error Happens*, even more than those ordinary happy cases ..."
 ---
