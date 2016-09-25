@@ -14,10 +14,9 @@ github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2016-9-
 of course, not when we're going to handle errors.<br>
 We, as software developers, like to only consider happy paths in our scenarios and consequently, tend to forget the fact
 that *Error Happens*, even more than those ordinary happy cases. Honestly, I can't even remember when was the last time I got an ok
-response from a payment API, those are *fail by default*.<br> How did you handle errors while designing and implementing
-your very last REST API? How did you handle validation errors? How did you deal with uncaught exceptions in your services? These are
-some of questions you should consider answering before designing a new REST API.
-<br>Of course, The most well known and unfortunate approach is *let the damn exception propagates* until our beloved client sees the
+response from a payment API, those are *fail by default*.<br>
+How did you handle errors while designing and implementing your very last REST API? How did you handle validation errors? How did you deal with uncaught exceptions in your services? If you didn't answer these questions before, no it's time to consider answering them before designing a new REST API.<br>
+Of course, The most well known and unfortunate approach is *let the damn exception propagates* until our beloved client sees the
 beautiful stacktrace on her client! If she can't handle our `NullPointerException`, she shouldn't call herself a developer.
 
 # Forget your platform: It's an *Integration Style*
@@ -29,7 +28,7 @@ In their amazing book, [Enterprise Integration Patterns][1], Gregor Hohpe and Bo
 > or your PDA’s PIM must synchronize with the corporate calendar server, it seems like any
 > application can be made better by integrating it with other applications.
 
-Then they introduced four *Integration Styles*. Regardless of the fact that the book was mainly about *Messaging Patterns*, we're going to focus on *Remote Procedure Invocation*. Remote Procedure Invocation is an umbrella term for all the approaches that expose some of application
+Then they introduced four *Integration Styles*. Regardless of the fact that the book was mainly about *Messaging Patterns*, we're going to focus on *Remote Procedure Invocation*. Remote Procedure Invocation is an umbrella term for all approaches that expose some of application
 functionalities through a *Remote Interface*, like REST and RPC. <br>
 Now that we've established that REST is an Integration Style:
 
@@ -155,7 +154,7 @@ Anyway, we can refactor our error response model to return an array of errors (s
 
 # "Talk is cheap, show me the code"
 ----
-Here I'm gonna provide a very minimal implementation of what we've talked about so far with Spring Boot. All codes are available at [github][github-source]. Let's start with error codes, The `ErrorCode` interface will act as a super-type for all our error codes:<br>
+Here I'm gonna provide a very minimal implementation of what we've talked about so far with Spring Boot. All the following codes are available at [github][github-source], you can skip rest of the article and check them out now. Anyway, Let's start with error codes, The `ErrorCode` interface will act as a super-type for all our error codes:<br>
 {% highlight java %}
 /**
  * Represents API error code. Each API should implement this interface to
@@ -462,7 +461,6 @@ And finally to glue all of these together, a Spring MVC `ExceptionHandler` would
 @ControllerAdvice
 class ApiExceptionHandler {
     private static final String NO_MESSAGE_AVAILABLE = "No message available";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     /**
      * Factory to convert the given {@linkplain Exception} to an instance of
@@ -490,37 +488,44 @@ class ApiExceptionHandler {
     }
 
     /**
-     * Catches all non-validation exceptions and tries to convert them to appropriate HTTP Error
-     * responses
+     * Catches all non-validation exceptions and tries to convert them to
+     * appropriate HTTP Error responses
      *
-     * <p>First using the {@linkplain #errorCodes} will find the corresponding {@linkplain ErrorCode}
-     * for the given {@code exception}. Then based on the resolved {@linkplain Locale}, a suitable
-     * instance of {@linkplain ErrorResponse} with appropriate and localized message will return
-     * to the client. {@linkplain ErrorCode} itself determines the HTTP status of the response.
+     * <p>First using the {@linkplain #errorCodes} will find the corresponding
+     * {@linkplain ErrorCode} for the given {@code exception}. Then based on
+     * the resolved {@linkplain Locale}, a suitable instance of
+     * {@linkplain ErrorResponse} with appropriate and localized message will
+     * return to the client. {@linkplain ErrorCode} itself determines the HTTP
+     * status of the response.
      *
      * @param exception The exception to convert
-     * @param locale The locale that usually resolved by {@code Accept-Language} header. This locale
-     *               will determine the language of the returned error message.
-     * @return An appropriate HTTP Error Response with suitable status code and error messages
+     * @param locale The locale that usually resolved by {@code Accept-Language}
+     * header. This locale will determine the language of the returned error
+     * message.
+     * @return An appropriate HTTP Error Response with suitable status code
+     * and error messages
      */
     @ExceptionHandler(ServiceException.class)
-    ResponseEntity<ErrorResponse> handleExceptions(ServiceException exception, Locale locale) {
+    ResponseEntity<ErrorResponse> handleExceptions(ServiceException exception,
+                                                   Locale locale) {
         ErrorCode errorCode = errorCodes.of(exception);
-        ErrorResponse errorResponse = ErrorResponse.of(errorCode.httpStatus(), toApiError(errorCode, locale));
+        ErrorResponse errorResponse = ErrorResponse.of(errorCode.httpStatus(),
+                                                       toApiError(errorCode, locale));
 
         return ResponseEntity.status(errorCode.httpStatus()).body(errorResponse);
     }
 
     /**
-     * Convert the passed {@code errorCode} to an instance of {@linkplain ErrorResponse} using
-     * the given {@code locale}
+     * Convert the passed {@code errorCode} to an instance of
+     * {@linkplain ErrorResponse} using the given {@code locale}
      */
     private ErrorResponse.ApiError toApiError(ErrorCode errorCode, Locale locale) {
         String message;
         try {
-            message = apiErrorMessageSource.getMessage(errorCode.code(), new Object[]{}, locale);
+            message = apiErrorMessageSource.getMessage(errorCode.code(),
+                                                       new Object[]{},
+                                                       locale);
         } catch (NoSuchMessageException e) {
-            LOGGER.error("Couldn't find any message for {} code under {} locale", errorCode.code(), locale);
             message = NO_MESSAGE_AVAILABLE;
         }
 
