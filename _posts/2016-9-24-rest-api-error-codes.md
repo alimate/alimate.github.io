@@ -15,7 +15,7 @@ of course, not when we're going to handle errors.<br>
 We, as software developers, like to only consider happy paths in our scenarios and consequently, tend to forget the fact
 that *Error Happens*, even more than those ordinary happy cases. Honestly, I can't even remember when was the last time I got an ok
 response from a payment API, those are *fail by default*.<br>
-How did you handle errors while designing and implementing your very last REST API? How did you handle validation errors? How did you deal with uncaught exceptions in your services? If you didn't answer these questions before, no it's time to consider answering them before designing a new REST API.<br>
+How did you handle errors while designing and implementing your very last REST API? How did you handle validation errors? How did you deal with uncaught exceptions in your services? If you didn't answer these questions before, now it's time to consider answering them before designing a new REST API.<br>
 Of course, The most well known and unfortunate approach is *let the damn exception propagates* until our beloved client sees the
 beautiful stacktrace on her client! If she can't handle our `NullPointerException`, she shouldn't call herself a developer.
 
