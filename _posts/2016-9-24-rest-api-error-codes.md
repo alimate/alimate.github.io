@@ -228,7 +228,7 @@ enum GeeksApiErrorCodes implements ErrorCode {
     }
 }
 {% endhighlight %}
-Then we should somehow convert different exceptions to appropriate `ErrorCode`s. `ExceptionToErrorCode` strategy interface would do that for us:<br>
+Then we should somehow convert different exceptions to appropriate `ErrorCode`s. `ExceptionToErrorCode` strategy interface does that for us:<br>
 {% highlight java %}
 /**
  * Strategy interface responsible for converting an instance of
@@ -431,15 +431,15 @@ class ErrorResponse {
         /**
          * The error code
          */
-        private final String errorCode;
+        private final String code;
 
         /**
          * Possibly localized error message
          */
         private final String message;
 
-        ApiError(String errorCode, String message) {
-            this.errorCode = errorCode;
+        ApiError(String code, String message) {
+            this.code = code;
             this.message = message;
         }
     }
