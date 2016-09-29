@@ -391,7 +391,7 @@ class ErrorResponse {
     private final List<ApiError> errors;
 
     private ErrorResponse(int statusCode, String reason, List<ApiError> errors) {
-        // Some preconditoon checks
+        // Some precondition checks
 
         this.statusCode = statusCode;
         this.reasonPhrase = reason;
