@@ -9,7 +9,7 @@
 cv_title: Ali Dehghani
 cv_email: ali.dehghani.g@gmail.com
 cv_description: "Ali Dehghani's CV"
-url: "https://alidg.me"
+url: "http://localhost:4000"
 cv_name: Ali Dehghani
 cv_job: Software Engineer
 cv_location: Tehran, Iran
@@ -27,4 +27,4 @@ description: A chemical romance bursts into the IT world
 markdown: kramdown
 
 # SSL
-enforce_ssl: alidg.me
+# enforce_ssl: alidg.me

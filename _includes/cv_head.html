@@ -4,6 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <META NAME="ROBOTS" CONTENT="INDEX, FOLLOW, ARCHIVE" />
 
+    <meta property="og:title" content="{{ site.cv_title }}" />
+    <meta property="og:description" content="{{ cv_description }}" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content="https://alidg.me" />
+
     <title>{% if page.cv_title %}{{ page.title | escape }}{% else %}{{ site.cv_title | escape }}{% endif %}</title>
     <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.cv_description }}{% endif %}">
 
