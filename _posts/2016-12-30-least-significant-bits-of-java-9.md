@@ -187,7 +187,7 @@ jshell> import java.util.stream.*
 jshell> langs.stream().filter(n -> n.startsWith("J")).collect(Collectors.toList())
 $11 ==> [Java, JS]
 {% endhighlight %}
-Anyway JShell is all about exploratory programming with features to ease interaction including: a history with editing, tab-completion, automatic addition of needed terminal semicolons, and configurable predefined imports and definitions.
+Anyway, JShell is all about exploratory programming with features to ease interaction, including: a history with editing, tab-completion, automatic addition of needed terminal semicolons, and configurable predefined imports and definitions.
 
 # New IO Features
 ---
