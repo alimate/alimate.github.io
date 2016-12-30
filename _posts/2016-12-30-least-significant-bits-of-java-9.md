@@ -41,12 +41,6 @@ Reactive Streams will be integrated in Java 9. In `java.util.concurrent` there i
 
 # More Concurrency Updates
 ---
-Java 9 also will be shipped with some enhancements to the `CompletableFuture` API, which was introduced in Java 8. There was a `completedFuture` static factory method in Java 8 to create a new `CompletableFuture` that is already completed with the given value. If you want to create an already failed `CompletableFuture`, you can use the new `failedFuture` static factory method:
-{% highlight java %}
-CompletableFuture.failedFuture(new IllegalArgumentException());
-{% endhighlight %}
-Also there will be `completedStage` and `failedStage` methods which will create new `CompletionStage`s that is already completed or failed, respectively.
-
 Suppose we have a `CompletableFuture` that going to fetch some movie recommendations from our fictional recommendation service. Now we want to add the capability of loading some static recommendations if the service couldn't provide the expected result in a timely manner:
 {% highlight java %}
 Supplier<List<Movie>> callTheRecommendationService = // call the slow service
@@ -64,6 +58,12 @@ CompletableFuture
         .orTimeout(1, TimeUnit.SECONDS)
         .thenAccept(showTheRecommendationsToUser);
 {% endhighlight %}
+
+Java 9 also will be shipped with some enhancements to the `CompletableFuture` API, which was introduced in Java 8. There was a `completedFuture` static factory method in Java 8 to create a new `CompletableFuture` that is already completed with the given value. If you want to create an already failed `CompletableFuture`, you can use the new `failedFuture` static factory method:
+{% highlight java %}
+CompletableFuture.failedFuture(new IllegalArgumentException());
+{% endhighlight %}
+Also there will be `completedStage` and `failedStage` methods which will create new `CompletionStage`s that is already completed or failed, respectively.
 
 # Convenience Factory Methods for Collections
 ---
