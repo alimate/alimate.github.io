@@ -59,7 +59,7 @@ CompletableFuture
         .thenAccept(showTheRecommendationsToUser);
 {% endhighlight %}
 
-Java 9 also will be shipped with some enhancements to the `CompletableFuture` API, which was introduced in Java 8. There was a `completedFuture` static factory method in Java 8 to create a new `CompletableFuture` that is already completed with the given value. If you want to create an already failed `CompletableFuture`, you can use the new `failedFuture` static factory method:
+Java 9 also will be shipped with some other enhancements to the `CompletableFuture` API, which was introduced in Java 8. There was a `completedFuture` static factory method in Java 8 to create a new `CompletableFuture` that is already completed with the given value. If you want to create an already failed `CompletableFuture`, you can use the new `failedFuture` static factory method:
 {% highlight java %}
 CompletableFuture.failedFuture(new IllegalArgumentException());
 {% endhighlight %}
