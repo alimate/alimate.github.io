@@ -114,7 +114,7 @@ For starters, let's declare a variable:
 jshell> String txt = "foo bar"
 txt ==> "foo bar"
 {% endhighlight %}
-As you can see *semicolons* are optional. JShell supports <kbd>Tab</kbd> *completion*, just type a few chars and hit tab and JShell tries its best to complete that name:
+As you can see *semicolons* are optional. JShell supports <kbd>Tab</kbd> *completion*, just type a few chars and hit <kbd>Tab</kbd> and JShell tries its best to complete that name:
 {% highlight bash %}
 jshell> txt.sub
 subSequence(   substring(
