@@ -177,7 +177,7 @@ jshell> /imports
 |    import java.io.*
 |    import java.math.*
 |    import java.net.*
-|    import java.util.concurren
+|    import java.util.concurrent
 |    import java.util.prefs.*
 |    import java.util.regex.*
 {% endhighlight %}
