@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Which GC algorithm is being used for a specific JVM instance?"
+title: "Which GC algorithm is being used by a specific JVM instance?"
 permalink: /blog/2017/3/30/find-gc-algorithm-jvm
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2017-3-30-find-gc-algorithm-jvm.md"
@@ -19,7 +19,7 @@ Would produce the following result:
 2915 sun.tools.jps.Jps
 2175 org.jetbrains.idea.maven.server.RemoteMavenServer
 {% endhighlight %}
-As you can spot from the output, the *Process Id* for my trivial Spring Boot app running with the `me.alidg.Application` main entry is `2913`. You find this process id using the typical `ps` (or whatever OS specific tool you have at your disposal) but it needs more filtering to find your desired JVM instance.<br>
+As you can spot from the output, the *Process Id* for my trivial Spring Boot app running with the `me.alidg.Application` main entry is `2913`. You also can find this process id using the typical `ps` (or whatever OS specific tool you have at your disposal) but it needs more filtering to find your desired JVM instance.<br>
 After finding the process id of the JVM instance, you can use the `jmap` utility. Basically `jmap` will provides heap dumps and other information about JVM memory usage:
 {% highlight bash %}
 jmap [option] <pid>
@@ -38,7 +38,7 @@ JVM version is 25.121-b13
 using parallel threads in the new generation.
 using thread-local object allocation.
 Concurrent Mark-Sweep GC
-// Truncated
+// truncated
 {% endhighlight %}
 As you can spot from the output, this JVM instance is using the *Concurrent Mark-Sweep GC* or *CMS* GC algorithm. If I run my Spring Boot app with the `-XX:+UseG1GC` flag, the output for the same command would be:
 {% highlight bash %}
@@ -49,6 +49,6 @@ JVM version is 25.121-b13
 
 using thread-local object allocation.
 Garbage-First (G1) GC with 8 thread(s)
-// Truncated
+// truncated
 {% endhighlight %}
 `jmap -heap` also will provide information about the JIT compiler, Heap configuration, Interned strings statistics and Heap usage.
