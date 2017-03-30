@@ -3,7 +3,7 @@ layout: post
 title: "Which GC algorithm is being used for a specific JVM instance?"
 permalink: /blog/2017/3/30/find-gc-algorithm-jvm
 comments: true
-github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2016-9-10-java-9-http-websocket-client.md"
+github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2017-3-30-find-gc-algorithm-jvm.md"
 excerpt: "Using the monitoring tools provided by the JDK, we can gain insights into the JVM itself. One of such insights that may come useful in some situations, is the GC algorithm..."
 ---
 Using the monitoring tools provided by the JDK, we can gain insights into the JVM itself. One of such insights that may come useful in some situations, is the GC algorithm used by a specific JVM instance. First off, we should somehow identify that JVM instance. In order to do that, we can use the `jps` utility to find all the running JVMs in the current machine or a machine specified with a `host-id`. <br>
