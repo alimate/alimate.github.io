@@ -28,3 +28,7 @@ markdown: kramdown
 
 # SSL
 enforce_ssl: alidg.me
+
+# Gems
+gems:
+  - jekyll-feed
