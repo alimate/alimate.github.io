@@ -5,16 +5,23 @@ permalink: /blog/2016/9/10/java-9-http-websocket-client
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2016-9-10-java-9-http-websocket-client.md"
 excerpt: "Although the flagship feature of Java 9 is Modularity, a large number of other enhancements are planned for this release. One of those is the new HTTP client API ..."
+
 ---
+# Update (13 July 2017)
+---
+The new HTTP Client will be shipped with Java 9 but as part of an [Incubator][5] module named `jdk.incubator.httpclient`. Incubator modules are a means of putting non-final APIs in the hands of developers while the APIs progress towards either finalization or removal in a future release.
+
+
 # Prologue
 ---
 Although the flagship feature of Java 9 is *Modularity*, a large number of other enhancements are planned for this release. One of those is the new HTTP client API which supports HTTP/2 and WebSocket and, hopefully, will replace the legacy `HttpUrlConnection` API, the low level and
 painful API. If you're wondering why that API was such a pain, consider reading [this post on stackoverflow][1].<br>
-This new API is part of the `java.httpclient` module. So, if you're going to use this module, you should declare that your module *requires* the `java.httpclient` module. To do so, add the following to your `module-info.java` file:<br>
+This new API is part of the <del>`java.httpclient`</del> `jdk.incubator.httpclient` module. So, if you're going to use this module, you should declare that your module *requires* the `jdk.incubator.httpclient` module. To do so, add the following to your `module-info.java` file:<br>
 {% highlight java %}
 module me.alidg {
     // Other declarations
-    requires java.httpclient;
+    // requires java.httpclient;
+    requires jdk.incubator.httpclient;
 }
 {% endhighlight %}
 
@@ -76,7 +83,7 @@ CompletableFuture.allOf(futures).join();
 # WebSocket Client API
 ---
 
-`java.httpclient` module also contains a client for WebSocket. `WebScoket` interface is the heart of this new
+`jdk.incubator.httpclient` module also contains a client for WebSocket. `WebScoket` interface is the heart of this new
 addition which contains four other abstractions to build, represent close codes, listen for events and messages and finally, handling
 partial messages.<br>
 For starters, we could implement the `WebSocket.Listener` interface, which, as its name suggests, is a listener for events and messages on a `WebSocket`. For example, here after receiving each message, we're sending a request for one more message and then printing the current message on console:<br>
@@ -112,3 +119,4 @@ experiment with the API using the [Java 9 early access builds][4], have fun!
 [2]: http://openjdk.java.net/jeps/110
 [3]: http://download.java.net/java/jdk9/docs/api/index.html
 [4]: https://jdk9.java.net/download/
+[5]: http://openjdk.java.net/jeps/11
