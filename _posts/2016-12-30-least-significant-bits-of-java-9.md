@@ -222,11 +222,14 @@ is.transferTo(os);
 
 # New HTTP Client
 ---
- The other new addition to Java 9 is the new HTTP client API which supports HTTP/2 and WebSocket. This client isn't in the `java.base` module, so we should declare a dependency to the `java.httpclient` module in our `module-info.java`:
+<blockquote>
+The new HTTP Client will be shipped with Java 9 but as part of an Incubator module named jdk.incubator.httpclient. Incubator modules are a means of putting non-final APIs in the hands of developers while the APIs progress towards either finalization or removal in a future release.
+</blockquote>
+ The other new addition to Java 9 is the new HTTP client API which supports HTTP/2 and WebSocket. This client isn't in the `java.base` module, so we should declare a dependency to the `jdk.incubator.httpclient` module in our `module-info.java`:
  {% highlight java %}
  module me.alidg {
      // Other declarations
-     requires java.httpclient;
+     requires jdk.incubator.httpclient;
  }
 {% endhighlight %}
 There is a `HttpRequest` to represent an HTTP request which can be sent to a server:
