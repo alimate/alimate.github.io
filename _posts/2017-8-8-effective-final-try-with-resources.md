@@ -56,7 +56,7 @@ declared like:
 try (Resource resource = ...)
 {% endhighlight %}
 In Java 9, the try-with-resources statement [refined][2] in a way that it can accept `final` and `effectively final`
-variables. So you can write this in Java 9:
+variables. So in Java 9 you can write:
 {% highlight java %}
 InetSocketAddress birthPort = new InetSocketAddress(1989);
 DatagramChannel udpServer = DatagramChannel.open().bind(birthPort);
