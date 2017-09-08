@@ -1,9 +1,9 @@
 ---
 layout: post
 title: "Who's calling me?"
-permalink: /blog/2017/8/25/stack-walking-api-java9
+permalink: /blog/2017/9/8/stack-walking-api-java9
 comments: true
-github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2017-8-25-stack-walking-api-java9.md"
+github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2017-9-8-stack-walking-api-java9.md"
 excerpt: "There is new API in Java 9 which provides efficient mechanism for accessing to current thread's stack frames with abilities to filter and lazy access..."
 ---
 # Status Quo
@@ -69,6 +69,6 @@ Optional<? extends Class<?>> caller = walker.walk(frames ->
                 frames.skip(1).findFirst().map(StackFrame::getDeclaringClass)
         );
 {% endhighlight %}
-The `walk` method opens a sequential stream of `StackFrame`s for the current thread and then applies the function with the StackFrame stream.
+The `walk` method opens a sequential stream of `StackFrame`s for the current thread and then applies the function with the StackFrame stream. Also, when the `walk` method returns, that `Stream` will be automatically closed.
 
 [jep259]:http://openjdk.java.net/jeps/259
