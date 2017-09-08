@@ -17,7 +17,7 @@ Before Java 9, there were three different approaches that we could use to solve 
 
 - `SecurityManager::getClassContext` is a `protected` method, which allows a `SecurityManager` subclass to access the class context. Sure it's working and somewhat efficient but if we only had a more pleasant API at our disposal!
 
-- Last but not certainly least, there is my beloved, deprecated and JDK internal `sun.reflect.Reflection::getCallerClass` which is a very efficient way to find the caller of current executing method. Regardless of the fact that it's now deprecated, it's also a internal API which we shouldn't use in the first place.
+- Last but not certainly least, there is my beloved, deprecated and JDK internal `sun.reflect.Reflection::getCallerClass` which is a very efficient way to find the caller of current executing method. Regardless of the fact that it's now deprecated, it's also an internal API which we shouldn't use in the first place.
 
 Just to recap, current solutions are inefficient, incomplete, inconvenient and forbidden! [JEP 259][jep259] is an attempt to address these issues.
 
@@ -69,6 +69,6 @@ Optional<? extends Class<?>> caller = walker.walk(frames ->
                 frames.skip(1).findFirst().map(StackFrame::getDeclaringClass)
         );
 {% endhighlight %}
-The `walk` method opens a sequential stream of `StackFrame`s for the current thread and then applies the function with the StackFrame stream. Also, when the `walk` method returns, that `Stream` will be automatically closed.
+The `walk` method opens a sequential stream of `StackFrame`s for the current thread and then applies the function with the `StackFrame`s stream. Also, when the `walk` method returns, that `Stream` will be automatically closed.
 
 [jep259]:http://openjdk.java.net/jeps/259
