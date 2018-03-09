@@ -32,5 +32,3 @@ enforce_ssl: alidg.me
 # Gems
 gems:
   - jekyll-feed
-
-theme: jekyll-theme-merlot
