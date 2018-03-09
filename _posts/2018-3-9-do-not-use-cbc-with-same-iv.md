@@ -50,7 +50,7 @@ With the addition of IVs, same plaintext messages encrypt to different ciphertex
 
 ### One IV to rule them all
 ---
-By now, you probably can spot the problem in that code. We were using a **static IV for all encryptions/decryptions**. Since we were using an IV, we probably wanted to same plaintexts get encrypted to different ciphertexts. And on the other hand, by using the same IV over and over again, we've defeated this goal spectacularly! As a matter of fact, using a static IV is not any different with not using an IV at all.
+By now, you probably can spot the problem in that code. We were using a **static IV for all encryptions/decryptions**. Since we were using an IV, we probably wanted to same plaintexts get encrypted to different ciphertexts. And on the other hand, by using the same IV over and over again, we've defeated this goal spectacularly! As a matter of fact, using a static IV is not any different from not using an IV at all.
 
 ### How to maintain multiple IVs
 ---
