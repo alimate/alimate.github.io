@@ -24,7 +24,7 @@ email: ali.dehghani.g@gmail.com
 description: A chemical romance bursts into the IT world
 
 # Build settings
-markdown: kramdown
+markdown: maruku
 
 # SSL
 enforce_ssl: alidg.me
