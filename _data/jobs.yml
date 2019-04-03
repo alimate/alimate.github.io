@@ -1,3 +1,8 @@
+-   title: Author
+    company: <a href="http://baeldung.com/author/ali-dehghani/">Baeldung</a>
+    description: "Everything related to JVM ecosystem."
+    period: September 2018 - Today
+
 -   title: Senior Software Engineer
     company: Hamim
     description:  "Senior Software Engineer<br>Techs: Java, Spring, Git, etc."
