@@ -6,7 +6,7 @@ comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-1-11-lock-striping.md"
 excerpt: "A simple article to demonstrate the fact that how well a fine-grained synchronized concurrent data structure performs compared to its coarse-grained counterpart."
 ---
-There are dozens of decent lock-free hashtable implementations. Usually those data structures, instead of using plain locks, are using *CAS* based operations to be *Lock Free*. With this narrative, it might sound I'm gonna use this post to build an argument for lock-free data structures. That's not the case, quite suprisingly. On the contrary, here we're going to talk about *Plain Old Locks*.
+There are dozens of decent lock-free hashtable implementations. Usually, those data structures, instead of using plain locks, are using *CAS* based operations to be *Lock Free*. With this narrative, it might sound I'm gonna use this post to build an argument for lock-free data structures. That's not the case, quite surprisingly. On the contrary, here we're going to talk about *Plain Old Locks*.
 
 Now that everybody's on-board, Let's implement a concurrent version of `Map` with this simple contract:
 {% highlight java %}
@@ -47,7 +47,7 @@ public abstract class AbstractConcurrentMap<K, V> implements ConcurrentMap<K, V>
 
 ## One Size Fits All?
 ---
-What happens when the number of stored elements are way more then the number of buckets? Even in the presence of the most versatile hash-functions, our hash table's performance would degrade signifcantly. In order to prevent this, we need to add more buckets when needed:
+What happens when the number of stored elements are way more than the number of buckets? Even in the presence of the most versatile hash-functions, our hash table's performance would degrade significantly. In order to prevent this, we need to add more buckets when needed:
 {% highlight java %}
 protected abstract boolean shouldResize();
 protected abstract void resize();
@@ -159,7 +159,7 @@ Ideally we expect from a highly scalable concurrent data structure to serve such
 <p style="text-align:center">
   <img src="/images/seq-access.png" alt="Sequential Access">
 </p>
-As we're using only one lock for synchronization, concurrent requests will be blocked behind the first one that acquired the lock. When the first one releases the lock, the second one acquires it and after sometime, releases it. 
+As we're using only one lock for synchronization, concurrent requests will be blocked behind the first one that acquired the lock. When the first one releases the lock, the second one acquires it and after some time, releases it. 
 
 This phenomenon is known as **Sequential Access** (Something like *Head of Line Blocking*) and we should mitigate this effect in concurrent environments.
 
@@ -204,9 +204,9 @@ protected void release(Entry<K, V> entry) {
     lockFor(entry).unlock();
 }
 {% endhighlight %}
-The resize procedure is almost same as before. The only difference is that we should acquire all locks before the resize and release all of them after the resize.
+The resize procedure is almost the same as before. The only difference is that we should acquire all locks before the resize and release all of them after the resize.
 
-We expect the fine-grained appraoch to outperform the coarse-grained one, let's measure it!
+We expect the fine-grained approach to outperform the coarse-grained one, let's measure it!
 
 ## Moment of Truth
 ---
@@ -237,7 +237,7 @@ String randomKey() {
     return KEYS.get(ThreadLocalRandom.current().nextInt(100));
 }
 {% endhighlight %}
-Each time we will put a random key, get a random key and remove a random key. Each workload would run these three opertions 100 times. Adding the JMH to the mix, each workload would be executed thousands of times:
+Each time we will put a random key, get a random key and remove a random key. Each workload would run these three operations 100 times. Adding the JMH to the mix, each workload would be executed thousands of times:
 {% highlight java %}
 @Benchmark
 @BenchmarkMode(Throughput)
@@ -266,6 +266,6 @@ CI (99.9%): [13736.837, 13975.055] (assumes normal distribution)
 
 ## Recursive Split-Ordered Lists
 ---
-In their [paper](https://ldhulipala.github.io/readings/split_ordered_lists.pdf), Ori Shalev and Nir Shavit proposed a way to implement a lock-free hashtable. They used a way of ordering elements in a linked list so that they can be repeatedly “split” using a single compare-and-swap operation. Anyway, they've used a pretty different approach to implement this concurrent data structure. It's highly recommended to checkout and read that paper.
+In their [paper](https://ldhulipala.github.io/readings/split_ordered_lists.pdf), Ori Shalev and Nir Shavit proposed a way to implement a lock-free hashtable. They used a way of ordering elements in a linked list so that they can be repeatedly “split” using a single compare-and-swap operation. Anyway, they've used a pretty different approach to implement this concurrent data structure. It's highly recommended to check out and read that paper.
 
-Also, the source codes of this article is available on [Github](https://github.com/alimate/lock-striping).
+Also, the source codes of this article are available on [Github](https://github.com/alimate/lock-striping).
