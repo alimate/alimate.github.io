@@ -149,7 +149,7 @@ protected void resize() {
 {% endhighlight %}
 Please note that we should acquire and release the same lock for resize operation, too.
 
-## Sequential Access
+## Sequential Bottleneck
 ---
 Suppose there are three concurrent requests for putting something into first bucket, getting something from the third bucket and removing something from the sixth bucket:
 <p style="text-align:center">
@@ -161,7 +161,7 @@ Ideally we expect from a highly scalable concurrent data structure to serve such
 </p>
 As we're using only one lock for synchronization, concurrent requests will be blocked behind the first one that acquired the lock. When the first one releases the lock, the second one acquires it and after some time, releases it. 
 
-This phenomenon is known as **Sequential Access** (Something like *Head of Line Blocking*) and we should mitigate this effect in concurrent environments.
+This phenomenon is known as **Sequential Bottleneck** (Something like *Head of Line Blocking*) and we should mitigate this effect in concurrent environments.
 
 ## The United Stripes of Locks
 ---
