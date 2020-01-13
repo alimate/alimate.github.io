@@ -47,7 +47,7 @@ public abstract class AbstractConcurrentMap<K, V> implements ConcurrentMap<K, V>
 
 ## One Size Fits All?
 ---
-What happens when the number of stored elements are way more than the number of buckets? Even in the presence of the most versatile hash-functions, our hash table's performance would degrade significantly. In order to prevent this, we need to add more buckets when needed:
+What happens when the number of stored elements are way more than the number of buckets? Even in the presence of the most versatile hash-functions, our hashtable's performance would degrade significantly. In order to prevent this, we need to add more buckets when needed:
 {% highlight java %}
 protected abstract boolean shouldResize();
 protected abstract void resize();
@@ -58,22 +58,23 @@ With the help of these abstract template methods, here's how we can put a new ke
 public boolean put(K key, V value) {
     if (key == null) return false;
 
-    var result = false;
     var entry = new Entry<>(key, value);
     acquire(entry);
     try {
         var bucketNumber = findBucket(entry);
-        if (!table[bucketNumber].contains(entry)) {
+        var currentPosition = table[bucketNumber].indexOf(entry);
+        if (currentPosition == -1) {
             table[bucketNumber].add(entry);
             size++;
-            result = true;
+        } else {
+            table[bucketNumber].add(currentPosition, entry);
         }
     } finally {
         release(entry);
     }
 
     if (shouldResize()) resize();
-    return result;
+    return true;
 }
 
 protected int findBucket(Entry<K, V> entry) {
@@ -82,8 +83,8 @@ protected int findBucket(Entry<K, V> entry) {
 {% endhighlight %}
 In order to find a bucket for the new element, we are relying on the `hashcode` of the key. Also, we should calculate the `hashcode` modulo *the number of buckets* to prevent being out of bounds!
 
-The remaining parts are pretty straightforward: We're acquiring a lock for the new entry and only add the entry if it does not exist already. At the end of the operation, if we came to this conclusion that we should add more
-buckets, then we would do so to maintain the hash table's balance. The `get` and `remove` methods can also be implemented as easily.
+The remaining parts are pretty straightforward: We're acquiring a lock for the new entry and only add the entry if it does not exist already. Otherwise, we would update the current entry. At the end of the operation, if we came to this conclusion that we should add more
+buckets, then we would do so to maintain the hashtable's balance. The `get` and `remove` methods can also be implemented as easily.
 
 Let's fill the blanks by implementing all those abstract methods!
 
@@ -115,14 +116,14 @@ public final class CoarseGrainedConcurrentMap<K, V> extends AbstractConcurrentMa
 {% endhighlight %}
 The current *acquire* and *release* implementations are completely independent from the map entry. As promised, we're using just one `ReentrantLock` for synchronization. This approach is known as **Coarse-Grained Synchronization**, since we're using just one lock to enforce exclusive access across the whole hashtable.
 
-Also, we should resize the hash table to maintain its constant access and modification time. In order to do that, we can incorporate different heuristics. For example, when the average bucket size exceeds a specific number:
+Also, we should resize the hashtable to maintain its constant access and modification time. In order to do that, we can incorporate different heuristics. For example, when the average bucket size exceeds a specific number:
 {% highlight java %}
 @Override
 protected boolean shouldResize() {
     return size / table.length >= 5;
 } 
 {% endhighlight %}
-In order to add more buckets, we should copy the current hash table and create a new table with, say, twice the size. Then add all entries from the old table to the new one:
+In order to add more buckets, we should copy the current hashtable and create a new table with, say, twice the size. Then add all entries from the old table to the new one:
 {% highlight java %}
 @Override
 protected void resize() {
@@ -251,7 +252,7 @@ public void forStripedLocking() {
     workload(new LockStripedConcurrentMap<>());
 }
 {% endhighlight %}
-The coarse-grained implmentation can handle 8547 operations per second:
+The coarse-grained implmentation can handle 8547 operations per second on average:
 {% highlight text %}
 8547.430 ±(99.9%) 58.803 ops/s [Average]
 (min, avg, max) = (8350.369, 8547.430, 8676.476), stdev = 104.523
