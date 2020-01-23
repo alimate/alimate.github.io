@@ -1,50 +1,37 @@
--   title: Co-CTO
+-   title: CTO
     company: Jibit
-    description: "Being a part of the Engineering Leadership team, Helping to create a healthy culture, Performing architecture and code reviews and ensuring well-tested code, Recruiting new engineering team members & Collaborating with product and design teams"
+    description: "<ul><li>Highly efficient General Ledger capable of handling 30K+ TPS and 70K+ RPS with just one instance (Golang, Apache Solr, Postgres, GRPC, Protocol Buffers)</li><li>Clean Microservices Architecture & Cloud Native Patterns (Kubernetes, Istio, Grafana, Prometheus, Tracing, Circuit Breakers, Loki, Traefik, OpenEBS, Docker, etc.)</li><li>Effective Software Development Lifecycles (Git, GitHub Flow, Gitlab, GitHub, CI/CD, Sonar, CircleCI, Issue Tracking, Code Reviews, etc.)</li><li>Built outstanding and dynamic team of software engineers and developers which significantly boosted overall success of organization</li></ul>"
     period: March 2019 - Today
 
 -   title: Author
     company: Baeldung 
-    description: "Everything related to the JVM ecosystem <br>Techs: Java, Spring, JVM, Kotlin, etc."
+    description: "Contributing to software community by sharing my ideas about JVM Languages, Algorithms, Concurrency, Spring Ecosystem, etc."
     period: September 2018 - Today
 
--   title: Co-Technical Lead
+-   title: Technical Team Lead
     company: Jibit
-    description: "Led the technical team from efforts on requirements analysis, design, build, and deployment. Also, Provided guidance, direction, and support to developers.<br/>Techs: JVM, Java, Kotlin, Spring Boot, K8S, Istio, MySQL, RabbitMQ, RocketMQ, Redis, etc."
+    description: "<ul><li>Highly Scalable Notification System (Recently Open Sourced)</li><li>Migration of a poorly designed microservices architecture by applying cutting-edge architectural patterns</li><li>Leading the technical team from efforts on requirements analysis, design, build, and deployment</li><li>Performing architecture and code reviews and ensuring well-tested and well-documented code</li><li>Providing guidance, direction, and support to developers</li><li>Techs: JVM, Java, Kotlin, Spring Boot, Kubernetes, Istio, MySQL, RabbitMQ, Redis, PostgreSQL, NATS, Golang, etc.</li></ul>"
     period: October 2018 - March 2019
 
 -   title: Senior Software Engineer
     company: Hamim
-    description:  "ParsPam is Privileged Access Management solution that helps organizations to provide secured privileged access to critical assets and meet compliance requirements by securing, managing and monitoring privileged accounts and access.<br>Techs: Java, Spring, Git, etc."
+    description: "<ul><li>Highly Scalable Video-Capture Monitoring for Network Activities</li><li>Highly Extensible Authentication System Supporting 20+ Security Protocols</li><li>Participating in the full engineering lifecycle: Architecture, solution design, development, testing, deployment, monitoring and
+maintenance</li><li>Techs: Java, Kotlin, Spring, Golang, Docker Swarm, Apache Guacamole, PostgreSQL, etc.</li></ul>"
     period: April 2017 - October 2018 
 
 -   title: Senior Software Engineer
-    company: Tosan (Tosanboom)
-    description:  "Led the detail technical design, coding, code review and testing on new applications and enhancements of existing applications.<br>Techs: Java, Java EE, Spring, etc."
+    company: Tosan Payment Solutions
+    description:  "<ul><li>Revolutionizing the Traditional Payment Services by Providing Easy to Use and Secure Financial APIs</li><li>Providing Payment Services from 20+ different Financial Institutions under a Common Facade</li><li>Delegated Authorization on Financial Assets using OAuth 2.0</li><li>Mentoring in a Fintech Hackathon</li><li>Techs: Java, Spring, Java EE, Oracle, ELK, Redis, Continuous Integration & Delivery, etc.</li></ul>"
     period: September 2016 - April 2107
 
 
 -   title: Senior Software Engineer
-    company: Asre Danesh Afzar (Crowd Funding)
-    description:  "A hub to promote various projects from different crowd funding platforms. <br> Techs: Java, Scala, Spring Boot, Gradle, Play! Framework, SBT, Swagger, Oracle, Supervisord, Flyway, Jenkins, etc."
-    period: March 2016 - August 2016
-
--   title: DevOps Engineer
     company: Asre Danesh Afzar
-    description: "Providing the required infrastructures for developers to develop, test, document and deploy their services more efficiently.<br> Techs: Docker, Jenkins, Swagger, Git, Gitlab, etc."
-    period: August 2015 - August 2016
+    description:  "<ul><li>Highly Extensible & Scalable Full Text Search Engine & Recommendation Engine</li><li>Cutting 50% of the Load on Down Stream Services by Incorporating a Scalable Caching Infrastructure</li><li>Leading by Example to Promote Code Quality & Other Software Engineering Best Practices</li><li>Getting Involved in DevOps Related Issues</li><li>Techs: Java, Scala, Spring, Play! Framework, Oracle, Apache Solr, Varnish, Java EE, Heroku, etc.</li></ul>"
+    period: April 2012 - September 2016
 
--   title: Software Engineer
-    company: Asre Danesh Afzar (Cando)
-    description: "Developed its Search Platform, Deployed its Caching Infrastructure, Developed a Content-Based algorithm for App Recommendation Service, Developed background tasks to keep app repository in sync with Google Play, etc.<br>Techs: Spring Framework, Jersey, Solr, Varnish, etc."
-    period: April 2013 - March 2016
-
--   title: Python Web Developer
+-   title: Freelance Developer
     company: Freelance
-    description: "Techs: Python, Django, Flask, Pandas, etc."
-    period: 2010 - 2013
+    description: "Techs: Java, PHP, Python, Django, Flask, Pandas, etc."
+    period: 2008 - 2012
 
--   title: PHP Web Developer
-    company: Freelance
-    description: "Techs: PHP, Cake, HTML, CSS, etc."
-    period: 2007 - 2010
