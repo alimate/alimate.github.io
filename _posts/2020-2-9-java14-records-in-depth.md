@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Java Records: A Closer Look"
-permalink: /blog/2020/1/31/java14-records-in-depth
+permalink: /blog/2020/2/9/java14-records-in-depth
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-2-9-java14-records-in-depth.md"
 excerpt: "How records are represented under the hood?"
