@@ -18,7 +18,7 @@ In the previous [article](https://alidg.me/blog/2020/1/31/java14-records) we int
 3. Invoke Dynamic
   - Introducing Indy
   - User-Definable Bytecode
-  - How Indy Works?
+  - How Does Indy Work?
   - Why Indy?
   - The Object Methods
 4. Reflecting on Records
@@ -58,7 +58,7 @@ Interestingly, similar to *Enums*, **Records are normal Java classes** with a fe
  - Records can implement other interfaces.
  - For each component, there is an accessor method, e.g. `max` and `min`.
  - There are auto-generated implementations for `toString`, `equals` and `hashCode` based on all components.
- - Finally, there is an auto-generated constructor which accepts all components as its arguments.
+ - Finally, there is an auto-generated constructor that accepts all components as its arguments.
 
 Also, the `java.lang.Record` is just an abstract class with a protected no-arg constructor and a few other basic abstract methods:
 {% highlight java %}
@@ -80,7 +80,7 @@ Nothing special is about this class!
 
 ## The Curious Case of Data Classes
 ---
-Coming from a Kotlin or Scala background, one may spot some similarties between *Records* in Java, *Data Classes* in [Kotlin](https://kotlinlang.org/docs/reference/data-classes.html) and *Case Classes* in [Scala](https://docs.scala-lang.org/overviews/scala-book/case-classes.html). On the surface, they all share one very fundamental goal: *To facilitate writing data holders*.
+Coming from a Kotlin or Scala background, one may spot some similarities between *Records* in Java, *Data Classes* in [Kotlin](https://kotlinlang.org/docs/reference/data-classes.html) and *Case Classes* in [Scala](https://docs.scala-lang.org/overviews/scala-book/case-classes.html). On the surface, they all share one very fundamental goal: *To facilitate writing data holders*.
 
 Despite this fundamental similarity, things are very different at the bytecode level. 
 
@@ -148,7 +148,7 @@ Compiled from "Range.scala"
          4: invokevirtual #111  // Method ScalaRunTime$._toString:(LProduct;)LString;
          7: areturn
 {% endhighlight %}
-However, the `toString` calls the `scala.runtime.ScalaRunTime._toString` [static method](https://github.com/scala/scala/blob/d1b3235438a24a323683148e63d368e4d094e4e5/src/library/scala/runtime/ScalaRunTime.scala#L135). That in turn calls the `productIterator` method to iterate through this *Product Type*. This iterator calls the `productElement` method which looks like:
+However, the `toString` calls the `scala.runtime.ScalaRunTime._toString` [static method](https://github.com/scala/scala/blob/d1b3235438a24a323683148e63d368e4d094e4e5/src/library/scala/runtime/ScalaRunTime.scala#L135). That, in turn, calls the `productIterator` method to iterate through this *Product Type*. This iterator calls the `productElement` method which looks like:
 {% highlight shell %}
 public java.lang.Object productElement(int);
     descriptor: (I)Ljava/lang/Object;
@@ -186,7 +186,7 @@ Again, the more we have properties in a `case class`, we would have more of thos
 
 ## Invoke Dynamic
 ---
-Let's take an even more closer look to the bytecode generated for the Java Records:
+Let's take an even closer look to the bytecode generated for the Java Records:
 {% highlight shell %}
 Compiled from "Range.java"
 public java.lang.String toString();
@@ -210,8 +210,8 @@ For quite some time JVM did support four method invocation types: `invokestatic`
 
 Despite their differences, these invocation types share one common trait: *we can't enrich them with our own logic*. On the contrary, `invokedynamic` enables us to *Bootstrap* the invocation process in any way we want. Then the JVM takes care of calling the *Bootstrapped Method* directly.
 
-### How Indy Works?
-The first time JVM sees a `invokedynamic` instruction, it calls a special static method called *Bootstrap Method*. **The bootstrap method is a piece of Java code that we've written to prepare the actual *to-be-invoked* logic**: 
+### How Does Indy Work?
+The first time JVM sees an `invokedynamic` instruction, it calls a special static method called *Bootstrap Method*. **The bootstrap method is a piece of Java code that we've written to prepare the actual *to-be-invoked* logic**: 
 <p style="text-align:center">
   <img src="/images/indy.png" alt="Invoke Dynamic">
 </p>
@@ -320,6 +320,6 @@ Serializable records are serialized and deserialized differently than ordinary s
 
 ## Conclusion
 ---
-Java Records are going to provide a new way to encapsualte data holders. Even though, currently, they're limited in terms of functionality (Compared to what Kotlin or Scala are offering), the implementation is *solid*.
+Java Records are going to provide a new way to encapsulate data holders. Even though currently, they're limited in terms of functionality (Compared to what Kotlin or Scala are offering), the implementation is *solid*.
 
 The first preview of Records would be available in March 2020. In this article, we've used the `openjdk 14-ea 2020-03-17` build, since the Java 14 is yet to be released!
