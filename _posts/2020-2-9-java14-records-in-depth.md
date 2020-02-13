@@ -215,7 +215,7 @@ The first time JVM sees an `invokedynamic` instruction, it calls a special stati
 <p style="text-align:center">
   <img src="/images/indy.png" alt="Invoke Dynamic">
 </p>
-Then the bootstrap method returns an instance of `java.invoke.CallSite`. This `CallSite` holds a reference to the actual method, i.e. `MethodHandle`. **From now on, every time JVM sees this `invokedynamic` instruction again, it skips the *Slow Path* and directly calls the underlying executable**. The JVM continues to skip the slow path unless *something changes*.
+Then the bootstrap method returns an instance of `java.lang.invoke.CallSite`. This `CallSite` holds a reference to the actual method, i.e. `MethodHandle`. **From now on, every time JVM sees this `invokedynamic` instruction again, it skips the *Slow Path* and directly calls the underlying executable**. The JVM continues to skip the slow path unless *something changes*.
 
 ### Why Indy?
 As opposed to the *Reflection APIs*, the `java.lang.invoke` API is quite efficient since the JVM can completely see through all invocations. Therefore, JVM may apply all sorts of optimizations as long as we avoid the slow path as much as possible!
