@@ -23,7 +23,8 @@ In the previous [article](https://alidg.me/blog/2020/1/31/java14-records) we int
   - The Object Methods
 4. Reflecting on Records
 5. Annotating Records
-6. Conclusion
+6. Serialization
+7. Conclusion
 
 ## Class Representation
 ---
@@ -53,7 +54,7 @@ public final class Range extends java.lang.Record {
 {% endhighlight %}
 Interestingly, similar to *Enums*, **Records are normal Java classes** with a few fundamental properties:
  - They are declared as `final` classes, so we can't inherit from them.
- - They're already inheriting from another class named `java.lang.Record`. Therefore, Records can't extend any other class, as Java does not support multiple-inheritance.
+ - They're already inheriting from another class named `java.lang.Record`. Therefore, Records can't extend any other class, as Java does not allow multiple-inheritance.
  - Records can implement other interfaces.
  - For each component, there is an accessor method, e.g. `max` and `min`.
  - There are auto-generated implementations for `toString`, `equals` and `hashCode` based on all components.
@@ -90,7 +91,7 @@ data class Range(val min: Int, val max: Int)
 {% endhighlight %}
 Similar to Records, Kotlin compiler generates accessor methods, default `toString`, `equals` and `hashCode` implementations and a few more functions based on this simple one-liner. 
 
-How do you think Kotlin compiler generates the code for, say, `toString`? Let's see:
+Let's see how the Kotlin compiler generates the code for, say, `toString`:
 {% highlight shell %}
 Compiled from "Range.kt"
   public java.lang.String toString();
@@ -116,9 +117,9 @@ Compiled from "Range.kt"
         36: invokevirtual #52 // Method StringBuilder.toString:()LString;
         39: areturn
 {% endhighlight %}
-We issued the `javap -c -p Range` to generate this output. Also, here we're using the simple class names for the sake of brevity. 
+We issued the `javap -c -v Range` to generate this output. Also, here we're using the simple class names for the sake of brevity. 
 
-Anyway, Kotlin is using the `StringBuilder` to generate the string representation instead of multiple string concatenations. That is:
+Anyway, Kotlin is using the `StringBuilder` to generate the string representation instead of multiple string concatenations (Like any decent Java developer!). That is:
  - At first, it creates a new instance of `StringBuilder` (index 0, 3, 4). 
  - Then it appends the literal `Range(min=` string (index 7, 9).
  - Then it appends the actual min value (index 12, 13, 16).
@@ -147,7 +148,7 @@ Compiled from "Range.scala"
          4: invokevirtual #111  // Method ScalaRunTime$._toString:(LProduct;)LString;
          7: areturn
 {% endhighlight %}
-The `toString` calls the `scala.runtime.ScalaRunTime._toString` [static method](https://github.com/scala/scala/blob/d1b3235438a24a323683148e63d368e4d094e4e5/src/library/scala/runtime/ScalaRunTime.scala#L135). That in turn calls the `productIterator` method to iterate through this *Product Type*. This iterator calls the `productElement` method which looks like:
+However, the `toString` calls the `scala.runtime.ScalaRunTime._toString` [static method](https://github.com/scala/scala/blob/d1b3235438a24a323683148e63d368e4d094e4e5/src/library/scala/runtime/ScalaRunTime.scala#L135). That in turn calls the `productIterator` method to iterate through this *Product Type*. This iterator calls the `productElement` method which looks like:
 {% highlight shell %}
 public java.lang.Object productElement(int);
     descriptor: (I)Ljava/lang/Object;
@@ -197,10 +198,10 @@ public java.lang.String toString();
          1: invokedynamic #18,  0 // InvokeDynamic #0:toString:(LRange;)Ljava/lang/String;
          6: areturn
 {% endhighlight %}
-Regardless of the number of record components, this will be the bytecode. *A simple, polished and elegant solution*. But how this `invokedynamic` thing works?
+**Regardless of the number of record components, this will be the bytecode**. *A simple, polished and elegant solution*. But how this `invokedynamic` thing works?
 
 ### Introducing Indy
-Invoke Dynamic (Also known as Indy) was part of JSR 292 intending to enhance the JVM support for *Dynamic Type Languages*. After its first release in Java 7, The `invokedynamic` opcode along with its `java.lang.invoke` luggage was used quite extensively by dynamic JVM-based languages like JRuby.
+Invoke Dynamic (Also known as Indy) was part of JSR 292 intending to enhance the JVM support for *Dynamic Type Languages*. After its first release in Java 7, The `invokedynamic` opcode along with its `java.lang.invoke` luggage is used quite extensively by dynamic JVM-based languages like JRuby.
 
 Although indy specifically designed to enhance the dynamic language support, it offers much more than that. As a matter of fact, it's suitable to use wherever a language designer needs any form of *dynamicity*, from dynamic type acrobatics to dynamic strategies! For instance, the [Java 8](https://www.youtube.com/watch?v=MLksirK9nnE) *Lambda Expressions* are actually implemented using `invokedynamic`, even though Java is a statically typed language!
 
@@ -223,7 +224,7 @@ In addition to the efficiency argument, the `invokedynamic` approach is more rel
 
 Moreover, the generated bytecode for Java Records is independent of the number of properties. So, less bytecode and faster startup time.
 
-Finally, let's suppose a new version of Java includs a new and more efficient bootstrap method implementation. Our app can take advantage of this improvement without recompilation. This way we have some sort of *Forward Binary Compatibility*. Also, That's the *dynamic strategy* we were talking!
+Finally, let's suppose a new version of Java includes a new and more efficient bootstrap method implementation. With `invokedynamic`, our app can take advantage of this improvement without recompilation. This way we have some sort of *Forward Binary Compatibility*. Also, That's the *dynamic strategy* we were talking!
 
 ### The Object Methods
 Now that we are familiar enough with Indy, let's make sense of the `invokedynamic` in Records bytecode:
@@ -240,7 +241,7 @@ BootstrapMethods:
       #50 REF_getField Range.min:I
       #51 REF_getField Range.max:I
 {% endhighlight %}
-So the bootstrap method for Records is called `bootstrap` which resides in the `java.lang.runtime.ObjectMethods` class. As you can see, this bootstrap method expects the following parameters:
+So the [bootstrap method](https://github.com/openjdk/jdk/blob/827e5e32264666639d36990edd5e7d0b7e7c78a9/src/java.base/share/classes/java/lang/runtime/ObjectMethods.java#L338) for Records is called `bootstrap` which resides in the `java.lang.runtime.ObjectMethods` class. As you can see, this bootstrap method expects the following parameters:
  - An instance of `MethodHandles.Lookup` representing the lookup context (The `Ljava/lang/invoke/MethodHandles$Lookup` part).
  - The method name (i.e. `toString`, `equals`, `hashCode`, etc.) the bootstrap is going to link. For example, when the value is `toString`, bootstrap will return a `ConstantCallSite` (a `CallSite` that never changes) that points to the actual `toString` implementation for this particular Record.
  - The `TypeDescriptor` for the method (`Ljava/lang/invoke/TypeDescriptor` part).
@@ -252,9 +253,73 @@ The `invokedynamic` instruction passes all those arguments to the bootstrap meth
 
 ## Reflecting on Records
 ---
+The `java.lang.Class` API has been retrofitted to support Records. For example, given a `Class<?>`, we can check whether it's a Record or not using the new `isRecord` method:
+{% highlight shell %}
+jshell> var r = new Range(0, 42)
+r ==> Range[min=0, max=42]
+
+jshell> r.getClass().isRecord()
+$5 ==> true
+{% endhighlight %}
+It obviously returns `false` for non-record types:
+{% highlight shell %}
+jshell> "Not a record".getClass().isRecord()
+$6 ==> false
+{% endhighlight %}
+There is, also, a `getRecordComponents` method which returns an array of `RecordComponent` in the same order they defined in the original record. Each `java.lang.reflect.RecordComponent` is representing a record component or variable of the current record type. For example, the `RecordComponent.getName` returns the component name:
+{% highlight shell %}
+jshell> public record User(long id, String username, String fullName) {}
+|  created record User
+
+jshell> var me = new User(1L, "alidg", "Ali Dehghani")
+me ==> User[id=1, username=alidg, fullName=Ali Dehghani]
+
+jshell> Stream.of(me.getClass().getRecordComponents()).map(RecordComponent::getName).
+   ...> forEach(System.out::println)
+id
+username
+fullName
+{% endhighlight %}
+In the same way the `getType` method returns the type token for each component:
+{% highlight shell %}
+jshell> Stream.of(me.getClass().getRecordComponents()).map(RecordComponent::getType).
+   ...> forEach(System.out::println)
+long
+class java.lang.String
+class java.lang.String
+{% endhighlight %}
+It's even possible to get a handle to accessor methods via `getAccessor`:
+{% highlight shell %}
+jshell> var nameComponent = me.getClass().getRecordComponents()[2].getAccessor()
+nameComponent ==> public java.lang.String User.fullName()
+
+jshell> nameComponent.setAccessible(true)
+
+jshell> nameComponent.invoke(me)
+$21 ==> "Ali Dehghani"
+{% endhighlight %}
 
 ## Annotating Records
 ---
+Java permits to annotate Records, As long as the annotation is applicable to a record or its members. Additionally, there would be a new annotation `ElementType` called `RECORD_COMPONENT`. Annotations with this target can only be used on record components:
+{% highlight java %}
+@Target(ElementType.RECORD_COMPONENT) 
+public @interface Param {}
+{% endhighlight %}
+
+## Serialization
+---
+Any new Java feature without a nasty relationship with *Serialization* would be *incomplete*. This time around, however, the relationship does not sound as disgusting as we're used to. 
+
+Although Records are not by default serializable, it's possible to make them so just by implementing the `java.io.Serializable` marker interface. 
+
+Serializable records are serialized and deserialized differently than ordinary serializable objects. The updated [javadoc](https://github.com/openjdk/jdk/blob/827e5e32264666639d36990edd5e7d0b7e7c78a9/src/java.base/share/classes/java/io/ObjectInputStream.java#L224) for `ObjectInputStream` states that:
+ - The serialized form of a record object is a sequence of values **derived from the record components**.
+ - The process by which record objects are serialized or externalized **cannot be customized**; any class-specific `writeObject`, `readObject`, `readObjectNoData`, `writeExternal`, and `readExternal` methods defined by record classes **are ignored** during serialization and deserialization.
+ - The `serialVersionUID` of a record class is `0L` unless explicitly declared.
 
 ## Conclusion
 ---
+Java Records are going to provide a new way to encapsualte data holders. Even though, currently, they're limited in terms of functionality (Compared to what Kotlin or Scala are offering), the implementation is *solid*.
+
+The first preview of Records would be available in March 2020. In this article, we've used the `openjdk 14-ea 2020-03-17` build, since the Java 14 is yet to be released!
