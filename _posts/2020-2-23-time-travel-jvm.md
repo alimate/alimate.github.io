@@ -67,7 +67,7 @@ For instance, the following code:
 {% highlight java %}
 Date now = new Date();
 {% endhighlight %}
-Transltes to the following bytecode:
+Translates to the following bytecode
 {% highlight shell %}
 0: new           #2  // class me/alidg/Date
 3: dup
