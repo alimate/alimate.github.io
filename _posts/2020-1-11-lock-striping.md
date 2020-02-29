@@ -5,6 +5,7 @@ permalink: /blog/2020/1/11/lock-striping
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-1-11-lock-striping.md"
 excerpt: "Let's see how well a fine-grained synchronized concurrent data structure performs compared to its coarse-grained counterpart"
+image: "https://images.unsplash.com/photo-1450704944629-6a65f6810cf2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"
 ---
 There are dozens of decent lock-free hashtable implementations. Usually, those data structures, instead of using plain locks, are using *CAS* based operations to be *Lock Free*. With this narrative, it might sound I'm gonna use this post to build an argument for lock-free data structures. That's not the case, quite surprisingly. On the contrary, here we're going to talk about *Plain Old Locks*.
 
@@ -114,7 +115,7 @@ public final class CoarseGrainedConcurrentMap<K, V> extends AbstractConcurrentMa
     // omitted
 }
 {% endhighlight %}
-The current *acquire* and *release* implementations are completely independent from the map entry. As promised, we're using just one `ReentrantLock` for synchronization. This approach is known as **Coarse-Grained Synchronization**, since we're using just one lock to enforce exclusive access across the whole hashtable.
+The current *acquire* and *release* implementations are completely independent of the map entry. As promised, we're using just one `ReentrantLock` for synchronization. This approach is known as **Coarse-Grained Synchronization** since we're using just one lock to enforce exclusive access across the whole hashtable.
 
 Also, we should resize the hashtable to maintain its constant access and modification time. In order to do that, we can incorporate different heuristics. For example, when the average bucket size exceeds a specific number:
 {% highlight java %}
@@ -152,11 +153,11 @@ Please note that we should acquire and release the same lock for resize operatio
 
 ## Sequential Bottleneck
 ---
-Suppose there are three concurrent requests for putting something into first bucket, getting something from the third bucket and removing something from the sixth bucket:
+Suppose there are three concurrent requests for putting something into the first bucket, getting something from the third bucket and removing something from the sixth bucket:
 <p style="text-align:center">
   <img src="/images/hashtable-reqs.png" alt="Concurrent Requests">
 </p>
-Ideally we expect from a highly scalable concurrent data structure to serve such requests with as little coordination as possible. However, this is what happens in the read world:
+Ideally, we expect from a highly scalable concurrent data structure to serve such requests with as little coordination as possible. However, this is what happens in the real world:
 <p style="text-align:center">
   <img src="/images/seq-access.png" alt="Sequential Access">
 </p>
@@ -211,7 +212,7 @@ We expect the fine-grained approach to outperform the coarse-grained one, let's 
 
 ## Moment of Truth
 ---
-In order to bechmark these two approaches, we're going to use the following workload on both implementations:
+In order to benchmark these two approaches, we're going to use the following workload on both implementations:
 {% highlight java %}
 final int NUMBER_OF_ITERATIONS = 100;
 final List<String> KEYS = IntStream.rangeClosed(1, 100)
@@ -252,13 +253,13 @@ public void forStripedLocking() {
     workload(new LockStripedConcurrentMap<>());
 }
 {% endhighlight %}
-The coarse-grained implmentation can handle 8547 operations per second on average:
+The coarse-grained implementation can handle 8547 operations per second on average:
 {% highlight text %}
 8547.430 ±(99.9%) 58.803 ops/s [Average]
 (min, avg, max) = (8350.369, 8547.430, 8676.476), stdev = 104.523
 CI (99.9%): [8488.627, 8606.234] (assumes normal distribution)
 {% endhighlight %}
-On the other hand, the fine-grained implmentation can handle up to 13855 operations per second on average.
+On the other hand, the fine-grained implementation can handle up to 13855 operations per second on average.
 {% highlight text %}
 13855.946 ±(99.9%) 119.109 ops/s [Average]
 (min, avg, max) = (13524.367, 13855.946, 14319.174), stdev = 211.716
