@@ -120,7 +120,7 @@ MicroBenchmark.ttasLock  avgt   40  0.001 ± 0.002   s/op
 {% endhighlight %}
 Similarly, the TTAS implementation outperforms the TAS one in terms of latency with less jitter. 
 
-*What is the cause for this performance degradation?*
+*What is the cause of this performance degradation?*
 
 ## Shared Multi-Processor Architecture
 ---
@@ -198,7 +198,7 @@ When the current holder releases the lock by storing `false` into `state`, all o
 {% highlight java %}
 while (state.get());
 {% endhighlight %}
-Would encounter a cache miss. Therefore, for the same reasons, the overall performace would degrade.
+Would encounter a cache miss. Therefore, for the same reasons, the overall performance would degrade.
 
 **The main issue with *Test and Set* and *Test, Test, and Set* implementations is the fact that they share the same *hotspot*. Too much contention exposes that hotspot in a way that it becomes the bottleneck.**
 
@@ -263,7 +263,7 @@ public void fairLock() {
     action.accept(fairLock);
 }
 {% endhighlight %}
-`ReentrantLock`s are not completely *fair* by default. However, by passing a `true` flag to its constructor, we can opt in for fairness:
+`ReentrantLock`s are not completely *fair* by default. However, by passing a `true` flag to its constructor, we can opt-in for fairness:
 {% highlight bash %}
 Benchmark                      Mode  Cnt         Score         Error  Units
 MicroBenchmark.fairLock       thrpt   40    193316.404 ±    1234.617  ops/s
@@ -294,6 +294,6 @@ In this article, we did evaluate different options we may encounter along the wa
 
 In January 1990, *Thomas A. Anderson* [published](https://www.cc.gatech.edu/classes/AY2009/cs4210_fall/papers/anderson-spinlock.pdf) a paper on *The performance of Spin Lock Alternatives for shared-memory multiprocessors.* In the paper, Anderson evaluated efficient algorithms for software spin-waiting given the hardware support for atomic instructions.
 
-Also, looking at the source code, e.g. [Java](https://github.com/openjdk/jdk/blob/8c647801fce4d6efcb3780570192973d16e4e6dc/src/java.base/share/classes/java/util/concurrent/locks/AbstractQueuedSynchronizer.java) or [Golang](https://github.com/golang/go/blob/05051b56a0184d8dfdb857e8ee10c99bfbf4646b/src/sync/mutex.go) or libraries like *PThreads*, can give us a good idea on how those concepts are actually implemented.
+Also, looking at the source code, e.g. [Java](https://github.com/openjdk/jdk/blob/8c647801fce4d6efcb3780570192973d16e4e6dc/src/java.base/share/classes/java/util/concurrent/locks/AbstractQueuedSynchronizer.java) or [Golang](https://github.com/golang/go/blob/05051b56a0184d8dfdb857e8ee10c99bfbf4646b/src/sync/mutex.go) or libraries like *PThreads*, can give us a good idea of how those concepts are actually implemented.
 
 As always, the source codes are available at [GitHub](https://github.com/alimate/locks-article)!
