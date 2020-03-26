@@ -185,8 +185,8 @@ If we run the benchmark:
 {% highlight bash %}
 Benchmark                      Mode  Cnt         Score         Error  Units
 MicroBenchmark.reentrantLock  thrpt   40  14259843.631 ±   82347.669  ops/s
-MicroBenchmark.tasLock        thrpt   40   2721541.567 ± 1693027.082  ops/s
-MicroBenchmark.ttasLock       thrpt   40   2362178.533 ± 1561169.794  ops/s
+MicroBenchmark.tasLock        thrpt   40  2149458.491  ± 1523535.026  ops/s
+MicroBenchmark.ttasLock       thrpt   40  2360037.269  ± 1586001.428  ops/s
 {% endhighlight %}
 Wow! Java's builtin approach beats our TTAS implementation by a whopping margin! The problem with TTAS is not when everyone is trying to acquire the lock, *it's when the holder releases the lock:*
 {% highlight java %}
@@ -268,8 +268,8 @@ public void fairLock() {
 Benchmark                      Mode  Cnt         Score         Error  Units
 MicroBenchmark.fairLock       thrpt   40    193316.404 ±    1234.617  ops/s
 MicroBenchmark.reentrantLock  thrpt   40  13100539.609 ±  118438.392  ops/s
-MicroBenchmark.tasLock        thrpt   40   3248509.796 ± 2079053.992  ops/s
-MicroBenchmark.ttasLock       thrpt   40   2458707.277 ± 1812340.278  ops/s
+MicroBenchmark.tasLock        thrpt   40  2149458.491  ± 1523535.026  ops/s
+MicroBenchmark.ttasLock       thrpt   40  2360037.269  ± 1586001.428  ops/s
 {% endhighlight %}
 *The things we do for fairness:* The `ReentrantLock` with barging (Also known as *convoy-avoidance* or even *renouncement* strategy) outperforms the fair one by 6600 percent. Even the simple TAS and TTAS implementations have more throughput.
 
