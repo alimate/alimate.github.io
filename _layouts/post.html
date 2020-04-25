@@ -7,6 +7,9 @@ layout: default
     <h1 class="post-title" itemprop="name headline">
       <a class="post-title-link"  href="{{page.url}}">{{ page.title }}</a>
     </h1>
+    {% if page.subtitle %}
+      <p><center style="opacity: 50%;"><em>{{ page.subtitle }}</em></center></p>
+    {% endif %}
     {% if page.github %}
       <center><a href="{{ page.github }}" title="Improve this post"><i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i></a></center>
     {% endif %}
