@@ -28,20 +28,20 @@ public class RandomBenchmark {
 
     @Benchmark
     @BenchmarkMode(Throughput)
-    public void regularRandom() {
-        random.nextInt();
+    public int regularRandom() {
+        return random.nextInt();
     }
 
     @Benchmark
     @BenchmarkMode(Throughput)
-    public void simpleThreadLocal() {
-        simpleThreadLocal.get().nextInt();
+    public int simpleThreadLocal() {
+        return simpleThreadLocal.get().nextInt();
     }
 
     @Benchmark
     @BenchmarkMode(Throughput)
-    public void builtinThreadLocal() {
-        ThreadLocalRandom.current().nextInt();
+    public int builtinThreadLocal() {
+        return ThreadLocalRandom.current().nextInt();
     }
 
     // omitted
@@ -49,17 +49,12 @@ public class RandomBenchmark {
 {% endhighlight %}
 In this benchmark, we're comparing the `Random`, our own `ThreadLocal<Random>` and the builtin `ThreadLocalRandom`:
 {% highlight text %}
-Benchmark                            Mode  Cnt           Score           Error  Units
-RandomBenchmark.builtinThreadLocal  thrpt   40  3334540550.091 ± 105934549.328  ops/s
-RandomBenchmark.regularRandom       thrpt   40     8303736.014 ±    276727.265  ops/s
-RandomBenchmark.simpleThreadLocal   thrpt   40   542379945.646 ±  12070648.559  ops/s
+Benchmark                             Mode  Cnt           Score          Error  Units
+RandomBenchmark.builtinThreadLocal   thrpt   40  1023676193.004 ± 26617584.814  ops/s
+RandomBenchmark.regularRandom        thrpt   40     7487301.035 ±   244268.309  ops/s
+RandomBenchmark.simpleThreadLocal    thrpt   40   382674281.696 ± 13197821.344  ops/s
 {% endhighlight %}
-The `ThreadLocalRandom` generated **around 3 billion random numbers per second**, dwarfing the `ThreadLocal<Random>` and plain `Random` approaches by a whopping margin.
-
-Running the same benchmark with different number of threads approves this result:
-<p style="text-align:center">
-  <img src="/images/random-throughput.png" alt="Comparing Random Generation Throughput">
-</p>
+The `ThreadLocalRandom` generated **around 1 billion random numbers per second**, dwarfing the `ThreadLocal<Random>` and plain `Random` approaches by a whopping margin.
 
 ## The Linear Congruential Method
 ---
@@ -114,11 +109,11 @@ public class MyThreadLocalRandom extends Random {
 {% endhighlight %}
 If we run the same benchmark again:
 {% highlight text %}
-Benchmark                             Mode  Cnt           Score           Error  Units
-RandomBenchmark.builtinThreadLocal   thrpt   40  3249198192.878 ± 170467195.257  ops/s
-RandomBenchmark.lockFreeThreadLocal  thrpt   40   919470439.880 ±  25062336.168  ops/s
-RandomBenchmark.regularRandom        thrpt   40     7602070.467 ±    232304.050  ops/s
-RandomBenchmark.simpleThreadLocal    thrpt   40   557197296.800 ±  10995269.098  ops/s
+Benchmark                             Mode  Cnt           Score          Error  Units
+RandomBenchmark.builtinThreadLocal   thrpt   40  1023676193.004 ± 26617584.814  ops/s
+RandomBenchmark.lockFreeThreadLocal  thrpt   40   695217843.076 ± 17455041.160  ops/s
+RandomBenchmark.regularRandom        thrpt   40     7487301.035 ±   244268.309  ops/s
+RandomBenchmark.simpleThreadLocal    thrpt   40   382674281.696 ± 13197821.344  ops/s
 {% endhighlight %}
 `MyThreadLocalRandom` has almost twice the throughput of our simple `ThreadLocal<Random>`. 
 
