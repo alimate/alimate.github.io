@@ -158,8 +158,32 @@ public static ThreadLocalRandom current() {
 With `MyThreadLocalRandom`, every call to the `current()` factory method, translates to a hash value computation for the `ThreadLocal` instance and a lookup in the underlying hashtable.
 
 On the contrary, with this new Java 8+ approach all we have to do is to read the `threadLocalRandomSeed` value directly and update it afterward.
-### The Unsafe
-TODO
+## Efficient Memory Access
+---
+In order to update the seed value, `java.util.concurrent.ThreadLocalRandom` needs to change the `threadLocalRandomSeed` state in the `java.lang.Thread` class. If we make the state `public`, then every body can potentially update `threadLocalRandomSeed` which is not good.
+
+We can use reflection to update the non-public state, but just because we can does not mean we should! 
+
+As it turns out, the `ThreadLocalRandom` uses the `Unsafe.putLong` to update the `threadLocalRandomSeed` state efficiently:
+{% highlight java %}
+/**
+* The seed increment.
+*/
+private static final long GAMMA = 0x9e3779b97f4a7c15L;
+private static final Unsafe U = Unsafe.getUnsafe();
+private static final long SEED = U.objectFieldOffset(Thread.class, "threadLocalRandomSeed");
+
+final long nextSeed() {
+    Thread t; 
+    long r; // read and update per-thread seed
+    U.putLong(t = Thread.currentThread(), SEED, r = U.getLong(t, SEED) + GAMMA);
+
+    return r;
+}
+{% endhighlight %}
+Basically the `putLong` method *writes the `r` value to some memory address relative to the current thread*. The memory offset already calculated by calling the `Unsafe.objectFieldOffset` method. 
+
+All these methods have native implementations and are very efficient.
 
 ## False Sharing
 ---
