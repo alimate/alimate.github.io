@@ -7,6 +7,7 @@ github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-4-
 excerpt: "Benchmarking regular randoms against thread-local ones!"
 image: https://alidg.me/images/random.jpg
 subtitle: "Any one who considers arithmetical methods of producing random digits is, of course, in a state of sin <br>-- John Von Neumann"
+toc: true
 ---
 Java 7 introduced the [`ThreadLocalRandom`](http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/java/util/concurrent/ThreadLocalRandom.java#l64) to improve the random number generation throughput in highly contended environments. 
 
@@ -160,11 +161,11 @@ With `MyThreadLocalRandom`, every call to the `current()` factory method, transl
 On the contrary, with this new Java 8+ approach all we have to do is to read the `threadLocalRandomSeed` value directly and update it afterward.
 ## Efficient Memory Access
 ---
-In order to update the seed value, `java.util.concurrent.ThreadLocalRandom` needs to change the `threadLocalRandomSeed` state in the `java.lang.Thread` class. If we make the state `public`, then every body can potentially update `threadLocalRandomSeed` which is not good.
+In order to update the seed value, `java.util.concurrent.ThreadLocalRandom` needs to change the `threadLocalRandomSeed` state in the `java.lang.Thread` class. If we make the state `public`, then every body can potentially update the `threadLocalRandomSeed`, which is not that good.
 
-We can use reflection to update the non-public state, but just because we can does not mean we should! 
+We can use reflection to update the non-public state, but *just because we can does not mean we should*! 
 
-As it turns out, the `ThreadLocalRandom` uses the `Unsafe.putLong` to update the `threadLocalRandomSeed` state efficiently:
+As it turns out, the `ThreadLocalRandom` uses the `Unsafe.putLong` native method to update the `threadLocalRandomSeed` state efficiently:
 {% highlight java %}
 /**
 * The seed increment.
@@ -181,9 +182,9 @@ final long nextSeed() {
     return r;
 }
 {% endhighlight %}
-Basically the `putLong` method *writes the `r` value to some memory address relative to the current thread*. The memory offset already calculated by calling the `Unsafe.objectFieldOffset` method. 
+Basically the `putLong` method *writes the `r` value to some memory address relative to the current thread*. The memory offset already calculated by calling another native method, i.e. `Unsafe.objectFieldOffset`. 
 
-All these methods have native implementations and are very efficient.
+As opposed to reflection, all these methods have native implementations and are very efficient.
 
 ## False Sharing
 ---

@@ -5,26 +5,9 @@ permalink: /blog/2020/2/9/java14-records-in-depth
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-2-9-java14-records-in-depth.md"
 excerpt: "How records are represented under the hood?"
+toc: true
 ---
 In the previous [article](https://alidg.me/blog/2020/1/31/java14-records) we introduced Records, a new preview feature in [Java 14](https://openjdk.java.net/projects/jdk/14/). Records are providing a nice compact syntax to declare classes that are supposed to be *dumb data holders*. In this article, we're going to see how Records are looking like under the hood. *So buckle up!*
-
-## Table of Contents
----
-
-1. Class Representation
-2. The Curious Case of Data Classes
-  - Kotlin's Data Classes
-  - Scala's Case Classes
-3. Invoke Dynamic
-  - Introducing Indy
-  - User-Definable Bytecode
-  - How Does Indy Work?
-  - Why Indy?
-  - The Object Methods
-4. Reflecting on Records
-5. Annotating Records
-6. Serialization
-7. Conclusion
 
 ## Class Representation
 ---

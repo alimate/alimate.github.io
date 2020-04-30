@@ -5,6 +5,7 @@ permalink: /blog/2018/3/9/not-use-one-iv-for-cbc
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2018-3-9-do-not-use-cbc-with-same-iv.md"
 excerpt: "One can use different algorithm types and modes for encryption. One of the famous cryptographic modes is Cipher Block Chaining or CBC..."
+toc: true
 ---
 Suppose we're gonna use *AES* with *CBC* mode for our encryption needs. This is how our first attempt looks like in Kotlin:
 {% highlight kotlin %}

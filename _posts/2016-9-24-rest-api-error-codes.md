@@ -6,6 +6,7 @@ excerpt: "We, as software developers, like to only consider happy paths in our s
 that Error Happens, even more than those ordinary happy cases ..."
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2016-9-24-rest-api-error-codes.md"
+toc: true
 ---
 
 # Do care about your clients

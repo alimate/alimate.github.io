@@ -5,6 +5,7 @@ permalink: /blog/2016/12/30/least-significant-bits-of-java-9
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2016-12-30-least-significant-bits-of-java-9.md"
 excerpt: "An overview of small and yet extremely useful new additions to Java 9..."
+toc: true
 ---
 
 # Prologue

@@ -5,6 +5,7 @@ permalink: /blog/2020/1/31/java14-records
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-1-31-java14-records.md"
 excerpt: "A sneak peek at Records which are going to previewed in Java 14"
+toc: true
 ---
 Java 14 is introducing a new preview feature called *Records*. Records provide a nice compact syntax to declare classes that are supposed to be *dumb data holders*. That may not sound much impressive but by taking a look at how we define such classes now, you might change your mind:
 {% highlight java %}

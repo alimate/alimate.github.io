@@ -23,7 +23,8 @@ $grey-color-light: lighten($grey-color, 40%);
 $grey-color-dark:  darken($grey-color, 25%);
 
 // Width of the content area
-$content-width:    1000px;
+$content-width:    60vw;
+$toc-width:        17vw;
 
 $on-palm:          600px;
 $on-laptop:        800px;
@@ -73,6 +74,34 @@ hr {
   margin-bottom: 0.5em;
 }
 
+#toc {
+  height: 100%;
+  width: $toc-width;
+  position: fixed;
+  z-index: 1;
+  top: 0; 
+  left: 0;
+  overflow-x: hidden; 
+  padding-top: 15%;
+  padding-right: 10px;
+  font-weight: bolder;
+  background-color: #f9f9f9;
+}
+#toc ul {
+  list-style-type: none;
+}
+
+@include media-query($on-laptop) {
+  #toc {
+    display: none;
+  }
+}
+
+@include media-query($on-palm) {
+  #toc {
+    display: none;
+  }
+}
 
 
 /**

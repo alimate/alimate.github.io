@@ -6,6 +6,7 @@ comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-2-23-time-travel-jvm.md"
 excerpt: "Let's allocate a Java object without calling its constructor!"
 image: "https://www.crystalinks.com/wormhole716.jpg"
+toc: true
 ---
 Let's repeat an ancient mistake:
 {% highlight java %}

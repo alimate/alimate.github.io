@@ -6,6 +6,7 @@ comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-1-11-lock-striping.md"
 excerpt: "Let's see how well a fine-grained synchronized concurrent data structure performs compared to its coarse-grained counterpart"
 image: "https://images.unsplash.com/photo-1450704944629-6a65f6810cf2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"
+toc: true
 ---
 There are dozens of decent lock-free hashtable implementations. Usually, those data structures, instead of using plain locks, are using *CAS* based operations to be *Lock Free*. With this narrative, it might sound I'm gonna use this post to build an argument for lock-free data structures. That's not the case, quite surprisingly. On the contrary, here we're going to talk about *Plain Old Locks*.
 

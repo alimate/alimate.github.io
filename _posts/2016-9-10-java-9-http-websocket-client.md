@@ -5,7 +5,7 @@ permalink: /blog/2016/9/10/java-9-http-websocket-client
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2016-9-10-java-9-http-websocket-client.md"
 excerpt: "Although the flagship feature of Java 9 is Modularity, a large number of other enhancements are planned for this release. One of those is the new HTTP client API ..."
-
+toc: true
 ---
 # Update (13 July 2017)
 ---

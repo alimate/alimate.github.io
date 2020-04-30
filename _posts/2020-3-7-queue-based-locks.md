@@ -6,6 +6,7 @@ comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-3-7-queue-based-locks.md"
 excerpt: "Let's implement a fair and highly scalable lock!"
 image: https://alidg.me/images/locks_martin_fowler_blog.jpg
+toc: true
 ---
 There are many things we take for granted in our everyday life. Probably *Locks* aren't one of them but ain't them adorable?
 {% highlight java %}
