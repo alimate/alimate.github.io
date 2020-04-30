@@ -24,7 +24,7 @@ $grey-color-dark:  darken($grey-color, 25%);
 
 // Width of the content area
 $content-width:    1000px;
-$toc-width:        350px;
+$toc-width:        280px;
 
 $on-palm:          600px;
 $on-laptop:        800px;
@@ -76,7 +76,7 @@ hr {
 
 #toc {
   height: 100%;
-  width: fit-content;
+  width: $toc-width;
   position: fixed;
   z-index: 1;
   top: 0; 
@@ -86,12 +86,13 @@ hr {
   padding-right: 10px;
   font-weight: bolder;
   background-color: #f9f9f9;
+  background-image: linear-gradient(to bottom, #f9f9f9, white);
 }
 #toc ul {
   list-style-type: none;
 }
 
-@include media-query(1700px) {
+@include media-query(1550px) {
   #toc {
     display: none;
   }
