@@ -23,8 +23,8 @@ $grey-color-light: lighten($grey-color, 40%);
 $grey-color-dark:  darken($grey-color, 25%);
 
 // Width of the content area
-$content-width:    60vw;
-$toc-width:        17vw;
+$content-width:    1000px;
+$toc-width:        350px;
 
 $on-palm:          600px;
 $on-laptop:        800px;
@@ -76,7 +76,7 @@ hr {
 
 #toc {
   height: 100%;
-  width: $toc-width;
+  width: fit-content;
   position: fixed;
   z-index: 1;
   top: 0; 
@@ -91,13 +91,7 @@ hr {
   list-style-type: none;
 }
 
-@include media-query($on-laptop) {
-  #toc {
-    display: none;
-  }
-}
-
-@include media-query($on-palm) {
+@include media-query(1700px) {
   #toc {
     display: none;
   }
