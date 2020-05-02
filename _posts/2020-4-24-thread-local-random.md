@@ -83,7 +83,7 @@ Since multiple threads can potentially update the `seed` value concurrently, we 
 
 Basically, each thread tries to change the seed value to a new one atomically via `compareAndSet`. If a thread fails to do so, it will retry the same process until it could successfully commit the update.
 
-**When the contention is high, the number of <span title="Comapre and Set">CAS</span> failures increases. That's the main reason behind the poor performance of `Random` in concurrent environemnts.**
+**When the contention is high, the number of <span title="Compare and Set">CAS</span> failures increases. That's the main reason behind the poor performance of `Random` in concurrent environments.**
 
 ## No More CAS
 ---
@@ -158,12 +158,12 @@ public static ThreadLocalRandom current() {
 ### Hashtable Lookup
 With `MyThreadLocalRandom`, every call to the `current()` factory method, translates to a hash value computation for the `ThreadLocal` instance and a lookup in the underlying hashtable.
 
-On the contrary, with this new Java 8+ approach all we have to do is to read the `threadLocalRandomSeed` value directly and update it afterward.
+On the contrary, with this new Java 8+ approach, all we have to do is to read the `threadLocalRandomSeed` value directly and update it afterward.
 ## Efficient Memory Access
 ---
-In order to update the seed value, `java.util.concurrent.ThreadLocalRandom` needs to change the `threadLocalRandomSeed` state in the `java.lang.Thread` class. If we make the state `public`, then every body can potentially update the `threadLocalRandomSeed`, which is not that good.
+In order to update the seed value, `java.util.concurrent.ThreadLocalRandom` needs to change the `threadLocalRandomSeed` state in the `java.lang.Thread` class. If we make the state `public`, then everybody can potentially update the `threadLocalRandomSeed`, which is not that good.
 
-We can use reflection to update the non-public state, but *just because we can does not mean that we should!* 
+We can use reflection to update the non-public state, but *just because we can do not mean that we should!* 
 
 As it turns out, the `ThreadLocalRandom` uses the `Unsafe.putLong` native method to update the `threadLocalRandomSeed` state efficiently:
 {% highlight java %}
@@ -192,7 +192,7 @@ CPU caches are working in terms of *Cache Lines*. That is, the cache line is the
 
 Basically, processors tend to cache a few other values along with the requested one. This *spatial locality* optimization usually improves both throughput and latency of memory access.
 
-However, **when two or more threads are competing for the same cache line, multithreading may have a counter productive effect.**
+However, **when two or more threads are competing for the same cache line, multithreading may have a counterproductive effect.**
 
 To better understand this, let's suppose that the following variables are residing in the same cache line:
 {% highlight java %}
@@ -246,7 +246,7 @@ public class Thread implements Runnable {
 Reader threads won't encounter a cache miss and the writer won't need to flush it store buffer right away, as those local variables aren't *volatile*.
 
 ### Contended Annotation
-The `jdk.internal.vm.annotation.Contended` annotation (`sun.misc.Contended` if you're on Java 8) is a hint for the JVM to isolate the annotated fields to avoid the false sharing. So, now the following should make more sense:
+The `jdk.internal.vm.annotation.Contended` annotation (`sun.misc.Contended` if you're on Java 8) is a hint for the JVM to isolate the annotated fields to avoid false sharing. So, now the following should make more sense:
 {% highlight java %}
 /** The current seed for a ThreadLocalRandom */
 @jdk.internal.vm.annotation.Contended("tlr")
@@ -266,4 +266,4 @@ With the help of the `ContendedPaddingWidth` tuning flag, we can control the [pa
 ---
 Before wrapping up, the `threadLocalRandomSecondarySeed` is a seed used internally by the likes of `ForkJoinPool` or `ConcurrentSkipListMap`. Also, the `threadLocalRandomProbe` represents whether the current thread has initialized its seed or not.
 
-In this article, we explored different tricks to optimize a RNG to be a high throughput and low latecny one. Tricks like more efficient object allocation, more efficient memory access, removing unnecessary indirection and having mechanical sympathy.
+In this article, we explored different tricks to optimize an RNG to be a high throughput and low latency one. Tricks like more efficient object allocation, more efficient memory access, removing unnecessary indirection, and having mechanical sympathy.
