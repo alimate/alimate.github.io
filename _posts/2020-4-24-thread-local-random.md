@@ -11,7 +11,7 @@ toc: true
 ---
 Java 7 introduced the [`ThreadLocalRandom`](http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/java/util/concurrent/ThreadLocalRandom.java#l64) to improve the random number generation throughput in highly contended environments. 
 
-The rational behind `ThreadLocalRandom` is simple, instead of sharing one global `Random` instance, each thread maintains its own version of `Random`. This, in turn, reduces the contention and hence the better throughput.
+The rationale behind `ThreadLocalRandom` is simple: instead of sharing one global `Random` instance, each thread maintains its own version of `Random`. This, in turn, reduces the contention and hence the better throughput.
 
 Since this is such a simple idea, we should be able to roll our sleeves up and implement something like `ThreadLocalRandom` with a comparable performance, *right?*
 
@@ -83,7 +83,7 @@ Since multiple threads can potentially update the `seed` value concurrently, we 
 
 Basically, each thread tries to change the seed value to a new one atomically via `compareAndSet`. If a thread fails to do so, it will retry the same process until it could successfully commit the update.
 
-When the contention is high, the number of <span title="Comapre and Set">CAS</span> failures increases. That's the main reason behind the poor performance of `Random` in concurrent environemnts.
+**When the contention is high, the number of <span title="Comapre and Set">CAS</span> failures increases. That's the main reason behind the poor performance of `Random` in concurrent environemnts.**
 
 ## No More CAS
 ---
@@ -120,7 +120,7 @@ RandomBenchmark.simpleThreadLocal    thrpt   40   382674281.696 ± 13197821.344 
 
 The `compareAndSet` provides atomicity and memory ordering guarantees that we simply don't need in a thread confined context. Since those guarantees are costly and unnecessary, removing them increases the throughput substantially.
 
-*However, we're still behind the builtin `ThreadLocalRandom`*!
+*However, we're still behind the builtin `ThreadLocalRandom`!*
 
 ## Removing Indirection
 ---
@@ -163,7 +163,7 @@ On the contrary, with this new Java 8+ approach all we have to do is to read the
 ---
 In order to update the seed value, `java.util.concurrent.ThreadLocalRandom` needs to change the `threadLocalRandomSeed` state in the `java.lang.Thread` class. If we make the state `public`, then every body can potentially update the `threadLocalRandomSeed`, which is not that good.
 
-We can use reflection to update the non-public state, but *just because we can does not mean we should*! 
+We can use reflection to update the non-public state, but *just because we can does not mean that we should!* 
 
 As it turns out, the `ThreadLocalRandom` uses the `Unsafe.putLong` native method to update the `threadLocalRandomSeed` state efficiently:
 {% highlight java %}
@@ -188,8 +188,82 @@ As opposed to reflection, all these methods have native implementations and are 
 
 ## False Sharing
 ---
-TODO
+CPU caches are working in terms of *Cache Lines*. That is, the cache line is the unit of transfer between CPU caches and the main memory. 
+
+Basically, processors tend to cache a few other values along with the requested one. This *spatial locality* optimization usually improves both throughput and latency of memory access.
+
+However, **when two or more threads are competing for the same cache line, multithreading may have a counter productive effect.**
+
+To better understand this, let's suppose that the following variables are residing in the same cache line:
+{% highlight java %}
+public class Thread implements Runnable {
+    private final long tid;
+    long threadLocalRandomSeed;
+    int threadLocalRandomProbe;
+    int threadLocalRandomSecondarySeed;
+
+    // omitted
+}
+{% endhighlight %}
+A few threads are using the `tid` or thread id for some unknown purpose. Now, if we update the, say, `threadLocalRandomSeed` in our thread to generate a random number, nothing bad should happen, *right?* It does not sound that much of a deal as some threads are reading the `tid` and another one writes to a whole another memory location.
+
+Despite what we might think, **since all those values are in the same cache line, the reading threads will encounter a cache miss**. And the writer needs to flush its store buffer. This phenomenon, known as *false sharing*, incurs a performance hit to our multithreaded application.
+
+### Padding
+To avoid the false sharing issue we can add some padding around the contended values. **This way each of those highly contended values will reside on their own cache line:**
+{% highlight java %}
+public class Thread implements Runnable {
+    private final long tid;
+    private long p11, p12, p13, p14, p15, p16, p17 = 0; // one 64 bit long + 7 more => 64 Bytes
+
+    long threadLocalRandomSeed;
+    private long p21, p22, p23, p24, p25, p26, p27 = 0;
+
+    int threadLocalRandomProbe;
+    private long p31, p32, p33, p34, p35, p36, p37 = 0;
+
+    int threadLocalRandomSecondarySeed;
+    private long p41, p42, p43, p44, p45, p46, p47 = 0;
+
+    // omitted
+}
+{% endhighlight %}
+Cache line size is usually 64 or 128 bytes in most modern processors. In my machine, it's 64 bytes, so I've added 7 more dummy `long` values right after the `tid` declaration. 
+
+Usually, those `threadLocal*` variables will be updated in the same thread. So we're better off just isolating the `tid`:
+{% highlight java %}
+public class Thread implements Runnable {
+    private final long tid;
+    private long p11, p12, p13, p14, p15, p16, p17 = 0;
+
+    long threadLocalRandomSeed;
+    int threadLocalRandomProbe;
+    int threadLocalRandomSecondarySeed;
+
+    // omitted
+}
+{% endhighlight %}
+Reader threads won't encounter a cache miss and the writer won't need to flush it store buffer right away, as those local variables aren't *volatile*.
+
+### Contended Annotation
+The `jdk.internal.vm.annotation.Contended` annotation (`sun.misc.Contended` if you're on Java 8) is a hint for the JVM to isolate the annotated fields to avoid the false sharing. So, now the following should make more sense:
+{% highlight java %}
+/** The current seed for a ThreadLocalRandom */
+@jdk.internal.vm.annotation.Contended("tlr")
+long threadLocalRandomSeed;
+
+/** Probe hash value; nonzero if threadLocalRandomSeed initialized */
+@jdk.internal.vm.annotation.Contended("tlr")
+int threadLocalRandomProbe;
+
+/** Secondary seed isolated from public ThreadLocalRandom sequence */
+@jdk.internal.vm.annotation.Contended("tlr")
+int threadLocalRandomSecondarySeed;
+{% endhighlight %}
+With the help of the `ContendedPaddingWidth` tuning flag, we can control the [padding width](https://github.com/openjdk/jdk/blob/1c6ca09b02af1018345a276c8b7cb21dd7f7feed/src/hotspot/share/classfile/classFileParser.cpp#L4401).
 
 ## Conclusion
 ---
-TODO
+Before wrapping up, the `threadLocalRandomSecondarySeed` is a seed used internally by the likes of `ForkJoinPool` or `ConcurrentSkipListMap`. Also, the `threadLocalRandomProbe` represents whether the current thread has initialized its seed or not.
+
+In this article, we explored different tricks to optimize a RNG to be a high throughput and low latecny one. Tricks like more efficient object allocation, more efficient memory access, removing unnecessary indirection and having mechanical sympathy.
