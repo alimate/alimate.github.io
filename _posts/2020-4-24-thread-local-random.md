@@ -163,7 +163,7 @@ On the contrary, with this new Java 8+ approach, all we have to do is to read th
 ---
 In order to update the seed value, `java.util.concurrent.ThreadLocalRandom` needs to change the `threadLocalRandomSeed` state in the `java.lang.Thread` class. If we make the state `public`, then everybody can potentially update the `threadLocalRandomSeed`, which is not that good.
 
-We can use reflection to update the non-public state, but *just because we can do not mean that we should!* 
+We can use reflection to update the non-public state, but *just because we can, does not mean that we should!* 
 
 As it turns out, the `ThreadLocalRandom` uses the `Unsafe.putLong` native method to update the `threadLocalRandomSeed` state efficiently:
 {% highlight java %}
