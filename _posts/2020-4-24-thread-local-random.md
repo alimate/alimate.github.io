@@ -267,3 +267,5 @@ With the help of the `ContendedPaddingWidth` tuning flag, we can control the [pa
 Before wrapping up, the `threadLocalRandomSecondarySeed` is a seed used internally by the likes of `ForkJoinPool` or `ConcurrentSkipListMap`. Also, the `threadLocalRandomProbe` represents whether the current thread has initialized its seed or not.
 
 In this article, we explored different tricks to optimize an RNG to be a high throughput and low latency one. Tricks like more efficient object allocation, more efficient memory access, removing unnecessary indirection, and having mechanical sympathy.
+
+As usual, the sample codes are available at [Github](https://github.com/alimate/thread-local-random).
