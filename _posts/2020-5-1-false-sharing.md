@@ -265,12 +265,43 @@ The `SimpleCounter` benchmark had 1,036,004,767 (~ 1 billion) L1 data cache miss
  291832840178      L1-dcache-loads           # 1804.308 M/sec
     120239626      L1-dcache-load-misses     #    0.04% of all L1-dcache hits
 {% endhighlight %} 
-The `Padded7Counter` encouuntered 120,239,626 cache misses, almost 900 million less cache misses compared to the simple approach.
+The `Padded7Counter` encountered 120,239,626 cache misses, almost 900 million fewer cache misses compared to the simple approach.
 
 What is the cause of such a difference between almost two identical implementations?
 
 ## Cache Line and Coherency
 ---
+CPU caches are working in terms of Cache Lines. That is, **the cache line is the unit of transfer between CPU caches and the main memory.**
+
+Basically, processors tend to cache a few more values in addition to the requested one. This spatial locality optimization usually improves both throughput and latency of memory access.
+
+However, *when two or more threads are competing for the same cache line, multithreading may have a counterproductive effect*, as they need to coordinate the cache access with each other. 
+
+*Maintaining the uniformity of shared values in different caches is knowon as cache coherency*. There are different protocols for maintaining the cache coherency such as *MESI* or *Modified, Exclusive, Shared, and Invalid*.
+
+Let's see how all this works in terms of the MESI coherency protocol. *Core A* and *B* are reading different values in different memory locations but in the same memory area. First, the *Core A* reads the value `v1`:
+<p style="text-align:center">
+  <img src="/images/cache-line-exclusive.png" alt="Cache Line: Exclusive Access">
+</p>
+As shown above, this core now has `exclusive` access to this particular cache line. After a while, *Core B* reads the `v2` value. The `v1` and `v2` are residing in the same cache line. Therefore, the cache line state changes to `shared`, as two cores are sharing it:
+<p style="text-align:center">
+  <img src="/images/cache-line-shared.png" alt="Cache Line: Shared Access">
+</p>
+From now on, if these two cores want to read any value from this cache line, they will avoid the memory access and just read the cache line. However, **this efficiency can be fragile, as one of these cores may decide to modify something in this cache line.**
+
+For the sake of argument, let's suppose *Core B* decides to increment the value of `v2`:
+<p style="text-align:center">
+  <img src="/images/cache-line-invalid.png" alt="Cache Line: Invalidation">
+</p>
+Now *Core B* tags its cache line as `modified` and communicates this state transition with the *Core A*. *Core A*, in turn, will re-tags its cache line as `invalid`. Usually, the processors will buffer such modifications in their *store buffers* before flushing it back to the main memory. Buffering and flushing back in batches can be a huge performance boost.
+
+Now let's suppose *Core A* decides to read any value from its invalid cache line:
+<p style="text-align:center">
+  <img src="/images/cache-line-flush.png" alt="Cache Line: Flush">
+</p>
+Since this cache line is invalid for *Core A*, it should read it again from the memory. This will force *Core B* to flush its modifications back to the memory. After that, both cores will cache the same line in the `shared` state. 
+
+Now imagine this process to happen millions of times each second. That's the reason behind the poor performance of our simple counter: **constant in-efficient memory access.**
 
 ## False Sharing
 ---
