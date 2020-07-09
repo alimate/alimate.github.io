@@ -119,7 +119,7 @@ Space losses: 4 bytes internal + 0 bytes external = 4 bytes total
 {% endhighlight %}
 We can visualize this layout as something like:
 <p style="text-align:center">
-  <img src="/images/simple-counter-ol.svg" alt="Object Layout for SimpleCounter">
+  <img src="/images/simple-counter-ol.png" alt="Object Layout for SimpleCounter">
 </p>
 **It follows the typical *OOP* or *Ordinay Object Pointer* structure in [JVM](https://www.baeldung.com/jvm-compressed-oops#1-object-memory-layout): an object header immediately followed by zero or more references to instance fields.** The header itself consists of one mark word, one *klass* word, and a 32-bit array length which is 12 bytes in total. Also, JVM may add up to 32-bits of padding for alignment purposes.
 
@@ -177,7 +177,7 @@ public class Padded1Counter implements Counter {
 {% endhighlight %}
 Here's how JVM lays out the `Padded1Counter` in heap:
 <p style="text-align:center">
-  <img src="/images/padded1-ol.svg" alt="Object Layout for Padded1Counter">
+  <img src="/images/padded1-ol.png" alt="Object Layout for Padded1Counter">
 </p>
 If we benchmark `Padded1Counter` against the `SimpleCounter`:
 {% highlight plain %}
@@ -203,7 +203,7 @@ public class Padded2Counter implements Counter {
 {% endhighlight %}
 The memory layout turns out to be like this:
 <p style="text-align:center">
-  <img src="/images/padded2-ol.svg" alt="Object Layout for Padded1Counter">
+  <img src="/images/padded2-ol.png" alt="Object Layout for Padded1Counter">
 </p>
 And the benchmark result is again interesting: 
 {% highlight plain %}
@@ -214,7 +214,7 @@ FalseSharingVictimBenchmark.simple     avgt   60  170.423 ± 4.913  ns/op
 {% endhighlight %}
 If we continue to add more paddings until we reach 7 bytes of padding, the memory layout would as isolated as:
 <p style="text-align:center">
-  <img src="/images/padded7-ol.svg" alt="Object Layout for Padded1Counter">
+  <img src="/images/padded7-ol.png" alt="Object Layout for Padded1Counter">
 </p>
 Each counter resides on its own 64 bytes isolated area. Let's see how's the benchmark looks like after all this:
 {% highlight plain %}
