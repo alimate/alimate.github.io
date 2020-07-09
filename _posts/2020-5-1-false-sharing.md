@@ -18,7 +18,7 @@ public interface Counter {
 {% endhighlight %}
 Each implementation encapsulates a collection of counters. The `inc` method is responsible for incrementing the counter at the given `index`.
 
-## No Contention
+## Atomic Counters
 ---
 Let's start with 8 distinct counters:
 {% highlight java %}
@@ -146,7 +146,7 @@ private long offsetOf(String fieldName) {
     return unsafe.objectFieldOffset(getField(counter.getClass(), fieldName));
 }
 {% endhighlight %}
-## Padding Effect
+## Padding: Random Encounter
 ---
 Let's see how adding some paddings between counters affect the latency. First, isolating the counters from the object header by adding 6 `long` values before `v1`:
 {% highlight java %}
@@ -233,7 +233,7 @@ FalseSharingVictimBenchmark.simple     avgt   60  170.423 ± 4.913  ns/op
 ---
 To instrument low-level CPU events, such as cycles, stall cycles, instructions, or memory loads/stores, one can program special hardware registers on the processors. 
 
-As it turns out, tools like *perf* or *BPF* are already using this approach to expose useful metrics. As of Linux 2.6.31, perf is the standard Linux profiler capable of exposing useful *Performance Monitoring Counters* or *PMCs*.
+**As it turns out, tools like *perf* or *BPF* are already using this approach to expose useful metrics.** As of Linux 2.6.31, perf is the standard Linux profiler capable of exposing useful *Performance Monitoring Counters* or *PMCs*.
 
 We can *perf_events* to see what's going on at the CPU level when running each of those benchmarks. For instance, if we run:
 {% highlight bash %}
@@ -305,10 +305,38 @@ Now imagine this process to happen millions of times each second. That's the rea
 
 ## False Sharing
 ---
+We saw different cores were reading from or writing to different memory locations. Despite that, *because those different values happened to be in the same cache line, changing one value induced a cache miss to another core*. 
 
-## How Much Padding?
+**This phenomenon, known as false sharing, can impose a lot of cache misses to different cores. This will, in turn, degrade the overall performance of the application.**
+
+Quite interestingly, *the common solution for false sharing is another memory-speed tradeoff*.
+
+## Padding Revisited
 ---
+To prevent false sharing, we can add enough garbage around each contended value:
+<p style="text-align:center">
+  <img src="/images/padding-sharing.png" alt="Padding">
+</p>
+This way each contended value will reside on its own cache line. Consequently, we will avoid unwanted contention between different cores, as each core gains exclusive access to its cache line. However, if two core operates on the same value, they will share the same cache line, which is reasonable.
 
+In most modern hardware architectures, the cache line size is around 64 to 128 bytes. So, adding, say, 7 other `long` values around the actual `long` will probably isolate that `long` variable in a separate cache line. 
+
+We say *probably* because memory layout of objects is a complicated subject in language runtimes such as JVM. Therefore, we should be sure about the layout before adding the padding.
+
+Anyway, we can find the cache line size in macOS by asking from `sysctl`:
+{% highlight bash %}
+$ sysctl machdep.cpu.cache.linesize
+64
+{% endhighlight %}
+On Linux:
+{% highlight bash %}
+$ getconf LEVEL1_DCACHE_LINESIZE
+64
+{% endhighlight %}
+
+Please note that, we should only add these sorts of paddings around *contended* values. Otherwise, we're trading some more memory for nothing special in return!
+
+Speaking of which, *let's see if there is a better way to avoid false sharing in Java*.
 ## @Contended
 ---
 
