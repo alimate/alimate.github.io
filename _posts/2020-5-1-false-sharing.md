@@ -121,7 +121,7 @@ We can visualize this layout as something like:
 <p style="text-align:center">
   <img src="/images/simple-counter-ol.png" alt="Object Layout for SimpleCounter">
 </p>
-**It follows the typical *OOP* or *Ordinay Object Pointer* structure in [JVM](https://www.baeldung.com/jvm-compressed-oops#1-object-memory-layout): an object header immediately followed by zero or more references to instance fields.** The header itself consists of one mark word, one *klass* word, and a 32-bit array length which is 12 bytes in total. Also, JVM may add up to 32-bits of padding for alignment purposes.
+**It follows the typical *OOP* or *Ordinay Object Pointer* structure in [JVM](https://www.baeldung.com/jvm-compressed-oops#1-object-memory-layout): an object header immediately followed by zero or more references to instance fields.** The header itself consists of one mark word, one *klass* word, and a 32-bit array length (only for arrays) which is 12 bytes in total. Also, JVM may add some paddings for alignment purposes.
 
 Immediately after object header and padding, there are 8 references to those 8 `long` instance fields.
 
@@ -337,8 +337,98 @@ $ getconf LEVEL1_DCACHE_LINESIZE
 Please note that, we should only add these sorts of paddings around *contended* values. Otherwise, we're trading some more memory for nothing special in return!
 
 Speaking of which, *let's see if there is a better way to avoid false sharing in Java*.
-## @Contended
+## *@Contended*
 ---
+The `jdk.internal.vm.annotation.Contended` annotation (`sun.misc.Contended` if you’re on Java 8) is a hint for the JVM to isolate the annotated fields to avoid false sharing. So we can rewrite our counters as the following:
+{% highlight java %}
+public class ContendedCounter implements Counter {
+
+    @jdk.internal.vm.annotation.Contended
+    private volatile long v1;
+
+    // well, do repeat yourself!
+}
+{% endhighlight %}
+Now if we inspect the memory layout of this class, we should see lots of padding around each field:
+{% highlight text %}
+me.alidg.ContendedCounter object internals:
+ OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
+      0    12        (object header)                           N/A
+     12     4        (alignment/padding gap)                  
+     16     8   long ContendedCounter.v1                       N/A
+     24     8   long ContendedCounter.v2                       N/A
+     32     8   long ContendedCounter.v3                       N/A
+     40     8   long ContendedCounter.v4                       N/A
+     48     8   long ContendedCounter.v5                       N/A
+     56     8   long ContendedCounter.v6                       N/A
+     64     8   long ContendedCounter.v7                       N/A
+     72     8   long ContendedCounter.v8                       N/A
+Instance size: 80 bytes
+Space losses: 4 bytes internal + 0 bytes external = 4 bytes total
+{% endhighlight %}
+OOPS! The `@Contended` annotation is in an `internal` package for a good reason. By default, only JDK internal abstractions can use this annotation. Therefore, there is no padding in the above example. 
+
+However, if we're so persistent in shooting ourselves in the foot, we can use the `-XX:-RestrictContended` tuning flag to remove this restriction:
+{% highlight text %}
+me.alidg.ContendedCounter object internals:
+ OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
+      0    12        (object header)                           N/A
+     12   132        (alignment/padding gap)                  
+    144     8   long ContendedCounter.v1                       N/A
+    152   128        (alignment/padding gap)                  
+    280     8   long ContendedCounter.v2                       N/A
+    288   128        (alignment/padding gap)                  
+    416     8   long ContendedCounter.v3                       N/A
+    424   128        (alignment/padding gap)                  
+    552     8   long ContendedCounter.v4                       N/A
+    560   128        (alignment/padding gap)                  
+    688     8   long ContendedCounter.v5                       N/A
+    696   128        (alignment/padding gap)                  
+    824     8   long ContendedCounter.v6                       N/A
+    832   128        (alignment/padding gap)                  
+    960     8   long ContendedCounter.v7                       N/A
+    968   128        (alignment/padding gap)                  
+   1096     8   long ContendedCounter.v8                       N/A
+Instance size: 1104 bytes
+Space losses: 1028 bytes internal + 0 bytes external = 1028 bytes total
+{% endhighlight %}
+By default, `@Contended` adds [128 bytes](https://github.com/openjdk/jdk/blob/9bac33fbc622d78c5b2360c59ee7b036e6cd92f1/src/hotspot/share/runtime/globals.hpp#L772) padding around each annotated field:
+{% highlight cpp %}
+/* Need to limit the extent of the padding to reasonable size.          */
+/* 8K is well beyond the reasonable HW cache line size, even with       */
+/* aggressive prefetching, while still leaving the room for segregating */
+/* among the distinct pages.                                            */
+product(intx, ContendedPaddingWidth, 128,                                 
+          "How many bytes to pad the fields/classes marked @Contended with")
+          range(0, 8192)                                                    
+          constraint(ContendedPaddingWidthConstraintFunc,AfterErgo) 
+{% endhighlight %}
+As shown above, this value is also configurable through `-XX:ContendedPaddingWidth` tuning flag.
+
+Anyway, the `@Contended` version has similar performace characteristics to the one with 7 8-bytes padding:
+{% highlight text %}
+Benchmark                              Mode  Cnt    Score   Error  Units
+FalseSharingVictimBenchmark.padded7    avgt   60   65.932 ± 3.191  ns/op
+FalseSharingVictimBenchmark.contended  avgt   60   62.154 ± 1.495  ns/op
+{% endhighlight %}
 
 ## Conclusion
 ---
+In recent years, the `@Contended` annotation has been used in JDK internal stuff to avoid false sharing. Here are a few notable examples:
+ - The `Thread` class to [store the random seed](https://github.com/openjdk/jdk/blob/b0e1ee4b3b345b729d14b897d503777ff779d573/src/java.base/share/classes/java/lang/Thread.java#L2059)
+ - The [`ForkJoinPool`](https://github.com/openjdk/jdk/blob/1e8806fd08aef29029878a1c80d6ed39fdbfe182/src/java.base/share/classes/java/util/concurrent/ForkJoinPool.java#L774) executor
+ - The [`Exchanger`](https://github.com/openjdk/jdk/blob/4d1445f42ee5fd98609cb9977a648bf58ec2c6c7/src/java.base/share/classes/java/util/concurrent/Exchanger.java#L305) concurrent utility
+ - The [`ConcurrentHashMap`](https://github.com/openjdk/jdk/blob/f29d1d172b82a3481f665999669daed74455ae55/src/java.base/share/classes/java/util/concurrent/ConcurrentHashMap.java#L2565)
+ - And the `Striped64` to implement [counters and accumulators](https://github.com/openjdk/jdk/blob/6bab0f539fba8fb441697846347597b4a0ade428/src/java.base/share/classes/java/util/concurrent/atomic/Striped64.java#L124) with high throughput (sounds familiar?)
+
+Also, here are a few more pointers on how this annotation works:
+ - `-XX:+EnableContended` [tuning flag](https://github.com/openjdk/jdk/blob/9bac33fbc622d78c5b2360c59ee7b036e6cd92f1/src/hotspot/share/runtime/globals.hpp#L777) to enable/disable the padding. By default, it's enabled
+ - Cotention [groups](https://github.com/openjdk/jdk/blob/319b4e71e1400f8a482f0ab42377d40056c6f0ac/src/hotspot/share/classfile/classFileParser.cpp#L1280)
+ - If we annotate a whole class with `@Contended`, then JVM will [adds some padding before all the fields](https://github.com/openjdk/jdk/blob/319b4e71e1400f8a482f0ab42377d40056c6f0ac/src/hotspot/share/classfile/classFileParser.cpp#L4236)
+ - Padding for [fields](https://github.com/openjdk/jdk/blob/319b4e71e1400f8a482f0ab42377d40056c6f0ac/src/hotspot/share/classfile/classFileParser.cpp#L4454)
+
+Also, in the article, we briefly talked about the memory layout of objects in JVM. For a more detailed exploration, it's highly recommended to check out the [oops section of the JVM source code](http://hg.openjdk.java.net/jdk8/jdk8/hotspot/file/87ee5ee27509/src/share/vm/oops/). Also, [Aleksey Shipilëv](https://shipilev.net/) has a much more [in-depth article](https://shipilev.net/jvm/objects-inside-out/) in this area.
+
+Moreover, more [examples of JOL](https://hg.openjdk.java.net/code-tools/jol/file/tip/jol-samples/src/main/java/org/openjdk/jol/samples/) are available as part of the project source code.
+
+As usual, all the examples are available [over on GitHub](https://github.com/alimate/false-sharing).
