@@ -235,7 +235,7 @@ To instrument low-level CPU events, such as cycles, stall cycles, instructions, 
 
 **As it turns out, tools like *perf* or *BPF* are already using this approach to expose useful metrics.** As of Linux 2.6.31, perf is the standard Linux profiler capable of exposing useful *Performance Monitoring Counters* or *PMCs*.
 
-We can *perf_events* to see what's going on at the CPU level when running each of those benchmarks. For instance, if we run:
+We can use *perf_events* to see what's going on at the CPU level when running each of those benchmarks. For instance, if we run:
 {% highlight bash %}
 >> perf stat -d java -jar benchmarks.jar simple 
 {% endhighlight %}
