@@ -4,7 +4,7 @@ title: "False Sharing"
 permalink: /blog/2020/5/1/false-sharing
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-5-1-false-sharing.md"
-excerpt: "Measuring false-sharing effect on latency"
+excerpt: "Measuring false-sharing effect on latency and throughput"
 image: https://alidg.me/images/cpu.png
 toc: true
 ---
