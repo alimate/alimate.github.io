@@ -9,11 +9,11 @@ image: https://alidg.me/images/15.jpg
 subtitle: "she said: it's like they're going to Uranus!"
 toc: true
 ---
-This simple peice of code probably prints one of the most misunderstood outputs in Java:
+This simple piece of code probably prints one of the most misunderstood outputs in Java:
 {% highlight java %}
 System.out.println(new Object());
 {% endhighlight %}
-And the output would be:
+And that output would be:
 {% highlight bash %}
 java.lang.Object@69663380
 {% endhighlight %}
@@ -65,7 +65,7 @@ static inline intptr_t get_next_hash(Thread* self, oop obj) {
   return value;
 }
 {% endhighlight %}
-As shown above, the hashcode generation strategy is determined by a mysterious and yet well-named `hashCode` variable. Let's see where does this [variable](https://github.com/openjdk/jdk/blob/f8f35d30afacc4c581bdd5b749bb978020678917/src/hotspot/share/runtime/globals.hpp#L704) come from:
+As shown above, **the hashcode generation strategy is determined by a mysterious and yet well-named `hashCode` variable**. Let's see where does this [variable](https://github.com/openjdk/jdk/blob/f8f35d30afacc4c581bdd5b749bb978020678917/src/hotspot/share/runtime/globals.hpp#L704) come from:
 {% highlight cpp %}
 experimental(intx, hashCode, 5, "(Unstable) select hashCode generation algorithm")  
 {% endhighlight %}
@@ -74,11 +74,13 @@ So this `hashCode` variable is actually an experimental tuning flag with a defau
 $ java -XX:+UnlockExperimentalVMOptions -XX:+PrintFlagsFinal -version | grep hashCode
 intx hashCode          = 5          {experimental} {default}
 {% endhighlight %}
-Put simply, we can use the `-XX:+UnlockExperimentalVMOptions -XX:hashCode=<i>` combination of tunables to change the strategy.
+Put simply, *we can use the `-XX:+UnlockExperimentalVMOptions -XX:hashCode=<i>` combination of tunables to change the strategy*.
+
+*Now let's see how each strategy works*.
 
 ## Park–Miller/Lehmer RNG
 ---
-The first hashcode generation strategy uses one of the most common random number generation strategies: a class of linear congruential generator (LCG) algorithms known as Lehmer RNG or even Park–Miller RNG:
+The first hashcode generation approach uses one of the most common random number generation strategies: a class of linear congruential generator (LCG) algorithms known as Lehmer RNG or even [Park–Miller RNG](https://dl.acm.org/doi/10.1145/63039.63042):
 {% highlight cpp %}
 static inline intptr_t get_next_hash(Thread* self, oop obj) {
   intptr_t value = 0;
@@ -111,13 +113,16 @@ int os::random() {
   }
 }
 {% endhighlight %}
-The `os::random()` tries to generate a random number from the global `_rand_seed` variable and then update that seed atomically. When multiple threads try to change the seed, only one of them can successfully change the seed and the `cmpxchg` will fail for others. Losing threads will retry the same operation until they succeed.
+The `os::random()` tries to generate a random number from the global `_rand_seed` variable and then update that seed atomically. 
 
-Therefore, in the presence of high contention, the rate of CAS failures will increase, hence this comment:
+When multiple threads try to change the seed, only one of them can successfully change the seed and the `cmpxchg` will fail for others. Losing threads will retry the same operation until they succeed.
+
+Therefore, **in the presence of high contention, the rate of CAS failures will increase, hence this comment**:
 {% highlight cpp %}
 // On MP system we'll have lots of RW access to a global, so the
 // mechanism induces lots of coherency traffic.
 {% endhighlight %}
+Quite interestingly, this high contention happens when a lot of objects are trying to generate their hashcode for the first time. This doesn't seem to be a contention point from the Java perspective. However, *with the `-XX:hashCode=0` this contention exists under the hood*.
 
 ## OOPs Based
 ---
@@ -134,7 +139,7 @@ else if (hashCode == 4) {
     value = cast_from_oop<intptr_t>(obj);
 }
 {% endhighlight %}
-So if use either of `-XX:hashCode=1` or `-XX:hashCode=4`, the hashcode will depend on the memory address.
+So if we use either of `-XX:hashCode=1` or `-XX:hashCode=4`, the hashcode will depend on the memory address.
 
 ## Static Number
 ---
@@ -144,7 +149,9 @@ else if (hashCode == 2) {
     value = 1;            // for sensitivity testing
 }
 {% endhighlight %}
-Which generates 1, all the time! If we run the same snippet with `-XX:+UnlockExperimentalVMOptions -XX:hashCode=2`:
+Which generates 1, all the time! 
+
+If we run the same snippet with `-XX:+UnlockExperimentalVMOptions -XX:hashCode=2`:
 {% highlight java %}
 System.out.println(new Object());
 {% endhighlight %}
@@ -152,7 +159,7 @@ Then it will print:
 {% highlight bash %}
 java.lang.Object@1
 {% endhighlight %}
-**So the part after `@` is always hashcode, at least!** I'm guessing they're using this strategy as a benchmark baseline. However, it's just a guess. If it's true, then this strategy ain't that useless after all.
+**So the part after `@` is always hashcode, at least!** I'm guessing they're using this strategy as a benchmark baseline. It's just a guess, though. If that's true, then this strategy ain't that useless after all.
 
 ## Sequential Numbers
 ---
@@ -200,18 +207,31 @@ else {
 {% endhighlight %}
 The implementation seems a bit complicated. However, the idea is simple. Instead of using some global shared mutable state as the seed, this is using a thread-specific state to generate the random number. Therefore, it will outperform the `os::random()` and the sequential approach, as there is no need for thread synchronization.
 
-Currently, this is the default hasshcode generation strategy.
+Currently, this is the default hashcode generation strategy.
 
 ## Good Hashcodes
 ---
-A hashcode implementation is a good one if it exhbits a uniform distrution and has a good performance. Let's evaluate each strategy with respect to these parameters:
- - The `os::random()` approach has a good uniformity and randomness. However, it won't perform that well in highly contended environments
- - The memory address based usually won't exhibit uniform distribution, which is very critical for hashcodes
+**A hashcode implementation is a good one if it exhibits both uniform distribution and good performance**. Let's evaluate each strategy with respect to these parameters:
+ - The `os::random()` approach has good uniformity and randomness. However, it won't perform that well in highly contended environments
+ - The memory address based approach usually won't exhibit uniform distribution, which is very critical for hashcodes
  - The one that always returns 1 is fun!
  - The Marsaglia's Xor-Shift generates random numbers with good distribution and also, good performance
 
+Here's a benchmark result from [Aleksey Shipilëv](https://shipilev.net):
+{% highlight text %}
+32 threads:
+-XX:hashCode=0: 10.7 +- 0.1 ops/usec
+-XX:hashCode=1: 175.2 +- 4.9 ops/usec
+-XX:hashCode=2: 184.8 +- 3.7 ops/usec
+-XX:hashCode=3: 14.2 +- 0.1 ops/usec
+-XX:hashCode=4: 160.0 +- 2.6 ops/usec
+-XX:hashCode=5: 176.6 +- 6.0 ops/usec
+{% endhighlight %}
+
 ## Conclusion
 ---
-Just to recap, the part after `@` **is definitly the identity hashcode**. The hashcode itself is usually a random number but can be a function of the object memory address. The identity hashcode, in the HotSpot JVM, consumes at most 31 bits of the object header, while the memory address may be up to 64 bits (No compressed OOPS). Therefore, the hashcode may not be equal to the memory address, even though it can be a function of it!
+Just to recap, the part after `@` **is definitely the identity hashcode**. 
 
-Before wrapping up, it's recommended to check out this [mailing list](http://mail.openjdk.java.net/pipermail/hotspot-runtime-dev/2013-January/005212.html) about the same subject.
+The hashcode itself is usually a random number but can also be a function of the memory address. The identity hashcode, in the HotSpot JVM, consumes [at most 31 bits of the object header](https://github.com/openjdk/jdk15/blob/e208d9aa1f185c11734a07db399bab0be77ef15f/src/hotspot/share/oops/markWord.hpp#L42), while the memory address may be up to 64 bits (without compressed references). Therefore, *the hashcode may not be equal to the memory address, even though it can be a function of it!*
+
+Before wrapping up, it's worth taking a look at this [mailing list](http://mail.openjdk.java.net/pipermail/hotspot-runtime-dev/2013-January/005212.html) on the same topic.
