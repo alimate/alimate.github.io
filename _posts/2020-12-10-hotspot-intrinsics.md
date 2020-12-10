@@ -254,9 +254,11 @@ bool InlineThreadNatives                      = true
 
 ## Closing Remarks
 ---
-In this article, we saw how the JVM may replace some critical Java methods with more efficient implementations at runtime. Of course, the JVM compiler is a complex piece of software. Therefore, covering all the details related to intrinsics is both beyond the scope of this article and certainly beyond the writer's knowledge. However, I hope this serves as a good starting point for the curious!
+In this article, we saw how the JVM may replace some critical Java methods with more efficient implementations at runtime. Of course, the JVM compiler is a complex piece of software. 
 
-As always, the source code are available on [GitHub](https://github.com/alimate/intrinsics)!
+Therefore, covering all the details related to intrinsics is both beyond the scope of this article and certainly beyond the writer's knowledge. However, I hope this serves as a good starting point for the curious!
+
+As always, the source code is available on [GitHub](https://github.com/alimate/intrinsics)!
 
 ---
 ## *fotenotes*
