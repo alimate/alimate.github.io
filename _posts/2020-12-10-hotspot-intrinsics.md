@@ -5,7 +5,7 @@ permalink: /blog/2020/12/10/hotspot-intrinsics
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-12-10-hotspot-intrinsics.md"
 excerpt: "How Does the HotSpot JVM Intrinsify Some Method Implementations?"
-image: https://alidg.me/images/observer.jpeg
+image: https://alidg.me/images/observer.png
 toc: true
 ---
 Sometimes, compilers have special treatments for some function implementations. Put simply, they replace the default implementation with another, possibly optimized, implementation. Such functions are known as *intrinsic functions* in compiler theory.
