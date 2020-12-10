@@ -53,7 +53,7 @@ public class IntrinsicsBenchmark {
 {% endhighlight %}
 *The result should be so predictable, right?*
 
-## The Observed State
+## The Observer Effect
 ---
 If we package the benchmark and run the following command:
 {% highlight bash %}
