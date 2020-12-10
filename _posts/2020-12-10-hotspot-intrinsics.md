@@ -5,7 +5,7 @@ permalink: /blog/2020/12/10/hotspot-intrinsics
 comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-12-10-hotspot-intrinsics.md"
 excerpt: "How Does the HotSpot JVM Intrinsify Some Method Implementations?"
-image: https://alidg.me/images/log.webp
+image: https://alidg.me/images/observer.jpeg
 toc: true
 ---
 Sometimes, compilers have special treatments for some function implementations. Put simply, they replace the default implementation with another, possibly optimized, implementation. Such functions are known as *intrinsic functions* in compiler theory.
@@ -256,8 +256,10 @@ bool InlineThreadNatives                      = true
 ---
 In this article, we saw how the JVM may replace some critical Java methods with more efficient implementations at runtime. Of course, the JVM compiler is a complex piece of software. Therefore, covering all the details related to intrinsics is both beyond the scope of this article and certainly beyond the writer's knowledge. However, I hope this serves as a good starting point for the curious!
 
-As always, the source code are available on [GitHub]()!
+As always, the source code are available on [GitHub](https://github.com/alimate/intrinsics)!
 
 ---
 ## *fotenotes*
 *1. Over the years, the file responsible for declaring the VM intrinsics has changed. For instance, before the `vmIntrinsics.hpp`, the `vmSymbols.hpp` was the home for all intrinsics.*
+
+*2. The cover image is from [lls-ceilap](http://www.lls-ceilap.com/vi-jornadas---english.html) on Quantum Observer Effect.*
