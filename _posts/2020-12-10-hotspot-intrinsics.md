@@ -261,7 +261,7 @@ Therefore, covering all the details related to intrinsics is both beyond the sco
 As always, the source code is available on [GitHub](https://github.com/alimate/intrinsics)!
 
 ---
-## *fotenotes*
+## *footnotes*
 *1. Over the years, the file responsible for declaring the VM intrinsics has changed. For instance, before the `vmIntrinsics.hpp`, the `vmSymbols.hpp` was the home for all intrinsics.*
 
 *2. The cover image is from [lls-ceilap](http://www.lls-ceilap.com/vi-jornadas---english.html) on Quantum Observer Effect.*
