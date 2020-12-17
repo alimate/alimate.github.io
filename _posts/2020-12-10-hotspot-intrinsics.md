@@ -65,11 +65,11 @@ Benchmark                               (value)   Mode  Cnt          Score      
 IntrinsicsBenchmark.direct    12346545756.54634  thrpt   20  151571897.277 ±  7878104.343  ops/s
 IntrinsicsBenchmark.indirect  12346545756.54634  thrpt   20  309745064.598 ± 12678366.349  ops/s
 {% endhighlight %}
-*We didn't see that coming, did we?!* The indirect `Meth.log()` implementation **outperforms the direct and supposedly more performant implementation by almost 105% in terms of throughput!**
+*We didn't see that coming, did we?!* The indirect `Math.log()` implementation **outperforms the direct and supposedly more performant implementation by almost 105% in terms of throughput!**
 
 ## Pandora's Box
 ---
-Let's take a closer look at the `Meth.log()` implementation once again, just to make sure we didn't missed something there:
+Let's take a closer look at the `Math.log()` implementation once again, just to make sure we didn't missed something there:
 {% highlight java %}
 @IntrinsicCandidate
 public static double log(double a) {
@@ -104,7 +104,7 @@ Anyway, the `@IntrinsicCandidate` may reveal the actual reason behind this shock
 public @interface IntrinsicCandidate {
 }
 {% endhighlight %}
-Well, based on this, **the HotSpot JVM *may* replace the `Meth.log()` Java implementation with a possibly more efficient compiler intrinsic to improve the performance.**
+Well, based on this, **the HotSpot JVM *may* replace the `Math.log()` Java implementation with a possibly more efficient compiler intrinsic to improve the performance.**
 
 ## Down the Rabbit Hole
 ---
@@ -140,7 +140,7 @@ do_name(exp_name,"exp")       do_name(min_name,"min")         do_name(max_name,"
 do_name(floor_name, "floor")  do_name(ceil_name, "ceil")      do_name(rint_name, "rint")
 do_intrinsic(_dlog, java_lang_Math, log_name, double_double_signature, F_S)
 {% endhighlight %}
-As shown by the last line, there is actually an intrinsic replacement for the `Meth.log()`. For instance, on x86-64 architectures, the `Math.log()` will be *intrinsified* as [follows](https://github.com/openjdk/jdk/blob/0a3e446ad95b09de2facee7107f7c1206339ee0d/src/hotspot/cpu/x86/stubGenerator_x86_64.cpp#L6335):
+As shown by the last line, there is actually an intrinsic replacement for the `Math.log()`. For instance, on x86-64 architectures, the `Math.log()` will be *intrinsified* as [follows](https://github.com/openjdk/jdk/blob/0a3e446ad95b09de2facee7107f7c1206339ee0d/src/hotspot/cpu/x86/stubGenerator_x86_64.cpp#L6335):
 {% highlight cpp %}
 if (vmIntrinsics::is_intrinsic_available(vmIntrinsics::_dlog)) {
     StubRoutines::_dlog = generate_libmLog();
