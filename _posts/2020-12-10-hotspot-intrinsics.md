@@ -108,6 +108,8 @@ Well, based on this, **the HotSpot JVM *may* replace the `Math.log()` Java imple
 
 ## Down the Rabbit Hole
 ---
+As it turns out, there actually is an intrinsic for the `Math.log()` method!
+
 The HotSpot JVM defines all its intrinsics in the [`vmIntrinsics.hpp`](https://github.com/openjdk/jdk/blob/master/src/hotspot/share/classfile/vmIntrinsics.hpp) file<sup>1</sup>. In the HotSpot, there are two types of intrinsics:
  - Library intrinsics: These are typical compiler intrinsics as they will replace the method implementations.
  - Bytecode intrinsics: These methods won't be replaced but instead would have special treatments.
