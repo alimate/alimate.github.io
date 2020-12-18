@@ -18,10 +18,10 @@ Probably, being a *space geek* is one of the most obvious reasons for this!
 </p>
 But *the passion*, *the excitement*, and the way he articulates complex subjects in a very approachable manner are equally as effective.
 
-I remember once, in particular, he was talking about measurements. Basically, he was saying that there is no such thing as..! Well, What's the fun in me telling the story? Let's see what he actually said, instead of just mentioning the gist of it here!
+I remember once, in particular, he was talking about measurements. Basically, he was saying that there is no such thing as..! Well, What's the fun in me telling the story? Let's see what [he actually said](https://www.masterclass.com/classes/neil-degrasse-tyson-teaches-scientific-thinking-and-communication/chapters/scientific-measurement-calculating-the-incalculable), instead of just mentioning the gist of it here!
 
 
-## Measurement Uncertainty
+## The Uncertainty Principle<sup style="font-size:small">1</sup>
 ---
 "Oh, of my favorite subjects to think about is measurement, something we so take for granted every day. **There are measurements all the time that we're exposed to**, that we're handed, that we do ourselves."
 
@@ -109,11 +109,11 @@ var channel = NettyChannelBuilder
     .build();
 var client = EchoServiceGrpc.newFutureStub(channel);
 {% endhighlight %}
-Here we're using the *work stealing* pool to handle the client requests. The second step is to initialize a `CountDownLatch` to the number of requests:
+Here we're using the *work stealing* pool to handle the client requests. The second step is to initialize a `CountDownLatch` equal to the number of requests:
 {% highlight java %}
 var latch = new CountDownLatch(requests);
 {% endhighlight %}
-This way we can wait for all requests to finish.
+This way we can wait for all the requests to finish.
 <p style="text-align:center">
   <img src="/images/archers.jpg" alt="Elf archers are ready to go"><br>
   <em><sup>Open fire? (https://bit.ly/3p4k7gi)</sup></em>
@@ -148,11 +148,11 @@ Probably, the server didn't warm up properly, yet. Re-running the same benchmark
 Took: 1543.706665 millis
 RPS: 6477.914636716296
 {% endhighlight %}
-It's better but I do believe we can do much better!
+It's better but I believe we can do even much better!
 
 ### Golang
 ---
-Let's implement the same benchmark using Golang. First off, we should generate the Proto stubs via the `protoc` compiler:
+Let's implement the same benchmark using Golang. First off, we should generate the proto stubs via the `protoc` compiler:
 {% highlight go %}
 //go:generate protoc -I src/main/proto --go_out=plugins=grpc:. echo_service.proto
 package main
@@ -168,7 +168,7 @@ import (
 	"time"
 )
 {% endhighlight %}
-Next step, we should connect to the server:
+Next step, let's connect to the server:
 {% highlight go %}
 var requests int
 flag.IntVar(&requests, "requests", 10_000, "The number of requests")
@@ -189,7 +189,7 @@ msg := &echo.Message{
 {% endhighlight %}
 <p style="text-align:center">
   <img src="/images/fire.jpg" alt="Elf archers are ready to go"><br>
-  <em><sup>Elf archers are ready to go!</sup></em>
+  <em><sup>ELF archers are ready to go!</sup></em>
 </p>
 And fire:
 {% highlight go %}
@@ -222,20 +222,20 @@ So the same gRPC server just handled 34K RPS! Something doesn't quite add up the
 So what can be the culprit for such a huge difference in the throughput of the same server? Maybe Golang is just much more powerful than JVM:
 <p style="text-align:center">
   <img src="/images/powerful-go.jpg" alt="Powerful Go!"><br>
-  <em><sup>Goroutines and Channels for the win!</sup></em>
+  <em><sup>Goroutines and Channels for the win! (https://bit.ly/34oqbbS)</sup></em>
 </p>
 Golang might found a better way to wait for IO! But let's compare these measuring devices for a moment to find a better explanation:
  - Java is a compiled language, which compiles to an intermediate language. JVM is responsible for executing the compiled IL or bytecode. The HotSpot implementation is using a technique called *Profile Guided Optimization (PGO)* to optimize the code while executing them.
  - Golang is a compiled language, as well. However, the code will be compiled to a native binary that is directly executable on the machine. So all the optimizations are done at compile-time. Consequently, there is no PGO there.
 
-Two valid technical choices with dramatic effects on the runtime. The more the HotSpot JVM executes a piece of code, the more the optimizations, and possibly a better performance. On the other hand, Golang artifacts already packaged with the native instructions. Therefore, there isn't much happening at runtime, in terms of compiler optimizations.
+Two valid technical choices with dramatic effects on the runtime. The more the HotSpot JVM executes a piece of code, the more the optimizations, and possibly a better performance. On the other hand, Golang artifacts already packaged with the native instructions. Therefore, there isn't much happening at runtime in terms of compiler optimizations.
 
 A few moments ago, we did send a few thousands of requests to the server, just to warm up the Java server (*what we were measuring!*). On the contrary, we didn't give any chance to the Java client to warm up properly! 
 <p style="text-align:center">
   <img src="/images/warmup.png" alt="Warm up!"><br>
-  <em><sup>Once I warm up, bring it on!</sup></em>
+  <em><sup>Once I warm up, bring it on! (https://bit.ly/3nyBu8O)</sup></em>
 </p>
-To test this hypothesis, let's perform a few rounds of warm up:
+To test this hypothesis, let's perform a few rounds of warmup:
 {% highlight java %}
 for (int j = 0; j < 10; j++) {
     var latch = new CountDownLatch(requests);
@@ -287,7 +287,7 @@ Took: 253.419225 millis
 RPS: 39460.305349761846
 ------------------
 {% endhighlight %}
-Look at the sudden jump in RPS between the first and second iterations, 20K RPS! And at the end, the warmed up client managed to record 39K requests per second. Paying some attention to the *measuring device* paid off!
+Look at the sudden jump in RPS between the first and second iterations, 17K RPS difference! And at the end, the warmed up client managed to record 39K requests per second. Paying some attention to the *measuring device* paid off!
 
 ## Closing Remarks
 ---
@@ -297,6 +297,21 @@ This knowledge helps us to understand the *measurement uncertainties* much bette
 
 Does that mean we did consider everything in our example? Absolutely not! That was only the compiler effect. We didn't consider the GC effect on both Golang and Java. Golang does not need that much of a warmup but the underlying machine does! We did run both the server and benchmarks on the same machine. Therefore competing resources (CPU, RAM, FDs, etc.) on the client and server-side might affect the result. This list goes on and on!
 
-The bottom line, **there is no such thing as absolute and infinite precision. There's only the precision that we'll be happy with!** 
+At some point, we should accept the fact that our measurement fails to take some parameters into account. Let's call it the "approximation that we're comfortable with".
+
+The bottom line is, **there is no such thing as absolute and infinite precision. There's only the precision that we'll be happy with!** 
 
 Also, If you're interested in watching the NDT talk that inspired this article, [go for it](https://www.youtube.com/watch?v=8IuBLd3qoUo)! Moreover, the source code is available on [GitHub](https://github.com/alimate/measure-twice)! 
+
+---
+## *footnotes*
+
+*1. "In the early 1800s, after the success of scientific theories such as Sir Newton's theory of Gravity, Laplace suggested that the universe is completely deterministic. That is if we know the state of the universe at some point, we can predict the next states.*
+
+*In 1926, the famous German scientist Werner Heisenberg suggested that to predict the future position and velocity of a particle, one has to be able to measure the current position and velocity precisely. As it turned out, measuring the position and the velocity are tightly bound to each other.*
+
+*The more we try to measure the position of a particle accurately, our velocity calculations will be less precise and vice versa! Heisenberg showed that the uncertainty in the position and velocity of a particle times the mass of it can never be smaller than a certain amount known as Planck's constant.*
+
+***The Heisenberg's Uncertainty Principle** is a fundamental, inescapable property of the world" -- A Brief History of Time, Stephen Hawking.* 
+
+*2. The idea of the first heading and consequently the first footnote is inspired by a comment from [Ehsan](https://www.linkedin.com/in/ehsan-abdollahi-19787aaa/).*
