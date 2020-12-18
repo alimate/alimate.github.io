@@ -56,7 +56,7 @@ These questions, among many others, are the reasons why our *measurement* might 
 Enough with the concepts, let's see a more concrete example.
 
 
-## Being Responsive
+## To Measure
 ---
 First, we need to implement something that we can measure its performance. To that end, let's implement a simple gRPC service the echos back whatever it receives. Here is the Protobuf description:
 {% highlight protobuf %}
