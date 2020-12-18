@@ -18,7 +18,7 @@ Probably, being a *space geek* is one of the most obvious reasons for this!
 </p>
 But *the passion*, *the excitement*, and the way he articulates complex subjects in a very approachable manner are equally as effective.
 
-I remember once, in particular, has was talking about measurements. Basically, he was saying that there is no such thing as..! Well, What's the fun in me telling the story? Let's see what he actually said, instead of just mentioning the gist of it here!
+I remember once, in particular, he was talking about measurements. Basically, he was saying that there is no such thing as..! Well, What's the fun in me telling the story? Let's see what he actually said, instead of just mentioning the gist of it here!
 
 
 ## Measurement Uncertainty
@@ -51,7 +51,7 @@ Here we've created a very simple measuring device, to measure the execution time
 
 Even in this simple example, our measurement device can be wrong or off for a lot of reasons. Did we account for NTP resets here? How about GC pauses? What if our process get preempted while executing the code? What if compiler threads compete for too much resources? CPU migrations? False sharing? CPU caches? 
 
-These questions, among many others, are the reasons why our *measurement* might be wrong. Most of the time, we are so concerned about *what we're measuring*. This is a very valid concern, to be fair. However, **knowing our measuring device is equally as important as what we're measuring.**
+These questions, among many others, are the reasons why our *measurement* might be off. Most of the time, we are so concerned about *what we're measuring*. This is a very valid concern, to be fair. However, **knowing our measuring device is equally as important as what we're measuring.**
 
 Enough with the concepts, let's see a more concrete example.
 
@@ -295,7 +295,7 @@ To reiterate, every measurement we make, about anything, is as accurate as our m
 
 This knowledge helps us to understand the *measurement uncertainties* much better. For instance, we saw how does the runtime characteristics affect our measurement result. 
 
-Does that mean we did consider everything in our example? Absolutely not! That was only the compiler effect. We didn't consider the GC effect on both Golang and Java. Golang does not need that much of a warm up but the underlying machine does! We did run both the server and benchmarks on the same machine. Therefore competing resources (CPU, RAM, FDs, etc.) on the client and server-side affect the result. This list goes on and on!
+Does that mean we did consider everything in our example? Absolutely not! That was only the compiler effect. We didn't consider the GC effect on both Golang and Java. Golang does not need that much of a warmup but the underlying machine does! We did run both the server and benchmarks on the same machine. Therefore competing resources (CPU, RAM, FDs, etc.) on the client and server-side might affect the result. This list goes on and on!
 
 The bottom line, **there is no such thing as absolute and infinite precision. There's only the precision that we'll be happy with!** 
 
