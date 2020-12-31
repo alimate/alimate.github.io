@@ -217,7 +217,7 @@ RPS:  34364.26116838488
 {% endhighlight %}
 So the same gRPC server just handled 34K RPS! Something doesn't quite add up there.
 
-## Cold Starts
+## Cut Once
 ---
 So what can be the culprit for such a huge difference in the throughput of the same server? Maybe Golang is just much more powerful than JVM:
 <p style="text-align:center">
