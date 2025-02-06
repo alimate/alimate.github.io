@@ -6,7 +6,6 @@ comments: true
 github: "https://github.com/alimate/alimate.github.io/blob/master/_posts/2020-7-15-hash-code.md"
 excerpt: "Have you ever wondered how does the HotSpot JVM generate identity hashcodes?"
 image: https://alidg.me/images/15.jpg
-subtitle: "she said: it's like they're going to Uranus!"
 toc: true
 ---
 This simple piece of code probably prints one of the most misunderstood outputs in Java:
